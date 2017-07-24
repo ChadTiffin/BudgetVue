@@ -1,0 +1,73 @@
+@media (max-height: 800px) {
+	.modal-body {
+		overflow-y: auto;
+		max-height: 690px;
+	}
+}
+
+@media (max-height: 640px) {
+	.modal-body {
+		overflow-y: auto;
+		max-height: 430px;
+	}
+}
+
+.fadeIn {
+	animation: fadeIn 0.5s;
+}
+
+.fadeOut {
+	animation: fadeIn 0.5s reverse;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+.zoomIn {
+	animation: zoomIn 0.5s;
+}
+
+.zoomOut {
+	animation: zoomIn 0.3s reverse;
+}
+
+@keyframes zoomIn {
+	from {
+		opacity: 0;
+		transform: scale(0.5,0.5);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1,1);
+	}
+}
+
+.slideUp {
+	animation-name: slideUp;
+	animation-duration: 1s;
+}
+
+.slideDown {
+	animation: slideUp 1s reverse;
+}
+
+@keyframes slideUp {
+	from {
+		max-height: 355px;
+		overflow: hidden;
+	}
+
+	to {
+		max-height: 0;
+		overflow: hidden;
+	}
+}

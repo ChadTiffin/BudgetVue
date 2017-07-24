@@ -1,0 +1,7 @@
+{
+  "name": "Tiffin Budget 2.0",
+  "short_name": "Budget 2.0",
+  "start_url": "https://budget.chadtiffin.com/budget",
+  "display": "standalone",
+  "orientation" : "any"
+}
