@@ -32,43 +32,63 @@
 					<td>{{ user.api_key }}</td>
 					<td>
 						<i class="fa fa-fw fa-pencil icon-button" v-on:click="editUser(user)"></i>
-						<i class="fa fa-fw fa-remove icon-button"></i>
+						<!--<i class="fa fa-fw fa-remove icon-button"></i>-->
 					</td>
 				</tr>
 			</tbody>
 		</table>
 
 		<ModalDialog
-			v-if="userDialog.visible" 
+			v-show="userDialog.visible" 
 			title="Edit User" 
 			:modal-visible="userDialog.visible" 
 			confirm-button-text="Save"
-			v-on:closeModal="userDialog.visible = false">
+			v-on:closeModal="userDialog.visible = false"
+			v-on:confirm="submitUser">
+
+			<p v-if="userDialog.newUser">
+				The user will be emailed a welcome email with their login details.
+			</p>
+
+			<FormGroup label="Username" col-class="col-md-3">
+				<p class="form-control-static">{{ userDialog.fields.username }}</p>
+			</FormGroup>
 			
 			<FormGroup label="First Name" col-class="col-md-3">
-				<input type="text" v-model='userDialog.fields.first_name' class="form-control">
+				<input type="text" v-model='userDialog.fields.first_name' name="first_name" class="form-control">
 			</FormGroup>
 
 			<FormGroup label="Last Name" col-class="col-md-3">
-				<input type="text" v-model='userDialog.fields.last_name' class="form-control">
+				<input type="text" v-model='userDialog.fields.last_name' name="last_name" class="form-control">
 			</FormGroup>
 
 			<FormGroup label="Email" col-class="col-md-3">
-				<input type="text" v-model='userDialog.fields.email' class="form-control">
+				<input type="text" v-model='userDialog.fields.email' name="email" class="form-control">
 			</FormGroup>
 
 			<FormGroup label="Permission" col-class="col-md-3">
-				<select class="form-control" v-model="userDialog.fields.user_level">
+				<select class="form-control" v-model="userDialog.fields.user_level" name="user_level">
 					<option>Admin</option>
 					<option>User</option>
+					<option>Suspended</option>
 				</select>
 			</FormGroup>
 
-
-
-			<FormGroup label="API Key" col-class="col-md-3">
-				<p class="form-control-static">{{ userDialog.fields.api_key }}</p>
+			<FormGroup v-if="!userDialog.newUser" label="API Key" col-class="col-md-3">
+				<p v-show="userDialog.fields.api_key != ''" class="form-control-static" style="word-break: break-all;">{{ userDialog.fields.api_key }}</p>
+				<button class="btn btn-danger" type="button" v-on:click="genNewAPIKey(userDialog.fields.id)"><i class="fa fa-refresh"></i> Generate New API Key</button>
 			</FormGroup>
+
+			<div class="alert" :class="userDialog.alert.class" v-if="userDialog.alert.visible">
+				{{ userDialog.alert.msg }}
+				<p v-if="userDialog.alert.hasErrors" v-for="error in userDialog.alert.errors">
+					{{error}}
+				</p>
+			</div>
+
+			<!--<FormGroup label="Password" col-class="col-md-3">
+				<button class="btn btn-danger" type="button" v-on:click="genNewPassword(userDialog.fields.id)"><i class="fa fa-refresh"></i> Reset Password</button>
+			</FormGroup>-->
 		</ModalDialog>
 
 		<ModalDialog
@@ -115,7 +135,15 @@
 				},
 				userDialog : {
 					visible: false,
-					fields: {}
+					newUser: false,
+					fields: {},
+					alert : {
+						visible: false,
+						class : "",
+						msg: "",
+						hasErrors: false,
+						errors: []
+					}
 				},
 				spinnerVisible : false,
 				users: []
@@ -123,12 +151,67 @@
 		},
 		methods: {
 			newUser() {
-
+				this.userDialog.visible = true;
+				this.userDialog.newUser = true;
+				this.userDialog.fields = {
+					last_name: "",
+					first_name: "",
+					email: "",
+					user_level: "User",
+					api_key: ""
+				}
 			},
 			editUser(user) {
 				this.userDialog.visible = true
+				this.userDialog.newUser = false;
 
 				this.userDialog.fields = user
+			},
+			deleteUser(user) {
+
+			},
+			submitUser() {
+				let payload = this.userDialog.fields;
+				let vm = this
+
+				let url = window.apiBase+"user/save"
+				if (this.userDialog.newUser) {
+					url = window.apiBase+"user/new"
+				}
+
+				this.postData(url,payload).then(function(response){
+					
+					if (response.status == "success") {
+						vm.userDialog.visible = false
+
+						vm.fetchUsers()
+					}
+					else {
+						vm.userDialog.alert.visible = true
+						vm.userDialog.alert.class = "alert-danger"
+						vm.userDialog.alert.msg = response.msg
+
+						if ("errors" in response) {
+							vm.userDialog.alert.errors = response.errors
+							vm.userDialog.alert.hasErrors = true
+						}
+					}
+
+				})
+			},
+			genNewAPIKey(user_id) {
+				let vm = this
+
+				let payload = {
+					user_id: user_id
+				}
+
+				this.postData(window.apiBase + "auth/new-api-key",payload).then(function(response){
+					if (response.status == "success")
+						vm.userDialog.fields.api_key = response.newKey
+
+
+				})
 			},
 			fetchUsers() {
 				let vm = this

@@ -55,6 +55,9 @@
 				:bank-accounts="bankAccounts"
 				:groups = "masterGroups" >
 			</TransactionClearing>
+			<MyProfile 
+				v-if="currentRoute == '/my-profile'">
+			</MyProfile>
 			
 		</div>
 
@@ -159,6 +162,7 @@
 
 <script type="text/javascript">
 	import BudgetManager from '../pages/BudgetManager'
+	import MyProfile from '../pages/MyProfile'
 	import TransactionClearing from '../pages/TransactionClearing'
 	import UserManager from '../pages/UserManager'
 	import AccountManager from '../pages/AccountManager'
@@ -180,6 +184,7 @@
 			CategoryManager,
 			UserManager,
 			TransactionLog,
+			MyProfile,
 			FormGroup,
 			ModalDialog,
 			DateField,

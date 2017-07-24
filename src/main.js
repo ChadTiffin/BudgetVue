@@ -6,7 +6,7 @@ import Dashboard from './templates/Dashboard'
 import Public from './templates/Public'
 import Ajax from './ajax'
 
-if ('serviceWorker' in navigator) {
+/*if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('sw.js').then(function(registration) {
       // Registration was successful
@@ -16,7 +16,7 @@ if ('serviceWorker' in navigator) {
       console.log('ServiceWorker registration failed: ', err);
     });
   });
-}
+}*/
 
 Vue.config.productionTip = false;
 
