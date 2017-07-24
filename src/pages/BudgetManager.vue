@@ -128,7 +128,7 @@
 
 		<h2>Budget</h2>
 
-		<div class="row">
+		<div class="row" v-if="!localIsOffline">
 
 			<div class="col-md-8 date-controls">
 				<div class="year-selector date-selector">
@@ -158,8 +158,10 @@
 				<thead>
 					<tr>
 						<th class="btn-col">
-							<button v-if="!editCategories" class="btn btn-warning" v-on:click="editCategories = true"><i class="fa fa-pencil"></i></button>
-							<button v-else class="btn btn-success" v-on:click="doneEditingBudget"><i class="fa fa-check"></i> Done</button>
+							<div v-if="!localIsOffline">
+								<button v-if="!editCategories" class="btn btn-warning" v-on:click="editCategories = true"><i class="fa fa-pencil"></i></button>
+								<button v-else class="btn btn-success" v-on:click="doneEditingBudget"><i class="fa fa-check"></i> Done</button>
+							</div>
 						</th>
 						<th class="col-cat">Group/Category</th>
 						<th class="col-amounts">Allocated</th>
@@ -220,7 +222,7 @@
 					<thead>
 						<tr class="group-heading">
 							<td class="btn-col has-control">
-								<i v-if="group.categories && group.name != 'Surplus'" class="fa fa-fw fa-arrows icon-button sort-group" title="Re-order this group"></i>
+								<i v-if="group.categories && group.name != 'Surplus' && !localIsOffline" class="fa fa-fw fa-arrows icon-button sort-group" title="Re-order this group"></i>
 							</td>
 							<th>
 								<input v-if="group.name != 'Surplus' && budgetEditable && group.descEditable"
@@ -260,10 +262,10 @@
 							<td class="td-indent" :class="{'has-control':cat.descEditable && cat.description != 'Surplus' }">
 								{{ cat.description }}
 							</td>
-							<td :class="{'has-control': budgetEditable}">
+							<td :class="{'has-control': budgetEditable}" class="number">
 								<input v-if="cat.description != 'Surplus' && budgetEditable" type="number" step="0.01" name="amount_alloc" placeholder="$ 0.00" class="form-control" v-on:change="autoSave(cat, 'budget', 'save')" v-model="cat.amount_alloc" >
 
-								<div v-else>{{cat.amount_alloc ? cat.amount_alloc : ''}}</div>
+								<div v-else>{{cat.amount_alloc ? parseFloat(cat.amount_alloc).toFixed(2) : ''}}</div>
 							</td>
 							<td class="bg-info number">{{ cat.carryOver ? cat.carryOver.toFixed(2) : '' }}</td>
 							<td class="bg-success number">{{ cat.inflowsAndIncome ? cat.inflowsAndIncome.toFixed(2) : '' }}</td>
@@ -616,20 +618,9 @@
 
 				this.spinnerVisible = true
 
-				console.log("fetch bugdet")
-
 				this.getJSON(window.apiBase + "budget/get-budget/"+this.budget_year+"/"+this.budget_month).then(function(json){
 
-					console.log("budget fetch return")
-					console.log(typeof json)
-					console.log(json)
-
-
 					vm.spinnerVisible = false
-
-
-					console.log("spinnerVisibile" + vm.spinnerVisible)
-					console.log("json status" + json.status)
 
 					if (json.status == "failed") {
 
@@ -649,7 +640,6 @@
 						
 					}
 					else if (json.status == "offline") {
-						console.log("offline")
 
 						vm.alert.class ="alert-danger"
 						vm.alert.visible = true
@@ -658,17 +648,9 @@
 						vm.localIsOffline = true
 						vm.budgetEditable = false
 
-
-
 						vm.groups = JSON.parse(localStorage.budgetGroups)
 						vm.income_sources = JSON.parse(localStorage.budgetIncomeSources)
 						vm.thisMonthIncome = localStorage.budgetThisMonthIncome
-
-						console.log(vm.groups)
-						
-
-						console.log("income sources:")
-						console.log(vm.income_sources)
 
 					}
 					else {

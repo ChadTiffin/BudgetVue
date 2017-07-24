@@ -516,17 +516,17 @@
 
 			vm.transactionsSynced = false
 
-			//send any locally saved transactions from offline use
-			if ("transactions" in localStorage) {
+			//sync any locally saved transactions from offline use
+			if ("transactionsSubmitted" in localStorage) {
 
 				let payload = {
-					records: localStorage.transactions
+					records: localStorage.transactionsSubmitted
 				}
 
 				this.postData(window.apiBase + "transaction/save-batch",payload).then(function(response){
 
 					if (response.status == "success") {
-						localStorage.removeItem("transactions")
+						localStorage.removeItem("transactionsSubmitted")
 						vm.transactionsSynced = true
 
 						setTimeout(function(){

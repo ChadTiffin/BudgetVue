@@ -2,7 +2,7 @@
 <div>
 	<section>
 		<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
-		<div class="filtering">
+		<div class="filtering" v-if="!isOffline">
 
 			<div class="btn-group" data-toggle="buttons" style="display: inline-block;">
 				<label class="btn btn-info" :class="{active: activeFilterButton == currentYear-1}" v-on:click="filterYear(currentYear-1)">
@@ -120,8 +120,10 @@
 						<td class="bg-success number" >{{ parseInt(tran.in_out) ? '' : tran.amount }}</td>
 						<td>{{ tran.first_name }}</td>
 						<td class="btn-col">
-							<i class="fa fa-fw icon-button fa-pencil" v-on:click="showTransactionModal(tran)"></i>
-							<i class="fa fa-fx fa-remove icon-button" v-on:click="deleteItem('transaction',tran.id, 'executeDeleteTransaction')"></i>
+							<div v-if="!isOffline">
+								<i class="fa fa-fw icon-button fa-pencil" v-on:click="showTransactionModal(tran)"></i>
+								<i class="fa fa-fx fa-remove icon-button" v-on:click="deleteItem('transaction',tran.id, 'executeDeleteTransaction')"></i>
+							</div>
 						</td>
 					</tr>
 				</tbody>
@@ -169,7 +171,7 @@
 			DateField,
 			ModalDialog
 		},
-		props: ["groups",'categories'],
+		props: ["groups",'categories','isOffline'],
 		data () {
 			return {
 				transactions : [],
@@ -316,8 +318,12 @@
 
 					vm.spinnerVisible = false
 
-					if (response.status == 'success') {
+					if (response.status == 'offline') {
+						vm.transactions = JSON.parse(localStorage.transactionLog)
+					}
+					else if (response.status == 'success') {
 						vm.transactions = response.transactions
+						localStorage.transactionLog = JSON.stringify(response.transactions)
 					}
 				})
 

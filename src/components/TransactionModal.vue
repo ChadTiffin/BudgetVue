@@ -279,14 +279,14 @@
 
 						//save transaction to localStorage
 						let cachedTrans = []
-						if ("transactions" in localStorage)
-							cachedTrans = JSON.parse(localStorage.transactions)
+						if ("transactionsSubmitted" in localStorage)
+							cachedTrans = JSON.parse(localStorage.transactionsSubmitted)
 						else 
 							cachedTrans = []
 						
 						cachedTrans.push(data)
 
-						localStorage.transactions = JSON.stringify(cachedTrans)
+						localStorage.transactionsSubmitted = JSON.stringify(cachedTrans)
 
 						vm.alert.class = "alert-success"
 						vm.alert.msg = "Transaction saved locally. When you get back online it will be synced with the server"
