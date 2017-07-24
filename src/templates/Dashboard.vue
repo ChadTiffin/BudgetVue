@@ -428,7 +428,6 @@
 					}
 
 					vm.masterGroups = groups
-					console.log(vm.masterGroups)
 				})
 			},
 			fetchBankAccounts() {
@@ -536,7 +535,7 @@
 
 						setTimeout(function(){
 							vm.transactionsSynced = false
-						},3000)
+						},10000)
 					}
 
 				})

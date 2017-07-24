@@ -24,7 +24,8 @@
 			<draggable
 				element='tbody'
 				v-model="localBankAccounts"
-				v-on:update="saveOrder">
+				v-on:update="saveOrder"
+				:options="{handle:'.sort-account'}">
 
 				<tr v-for="account in localBankAccounts">
 					<td class="btn-col has-control">
@@ -196,18 +197,17 @@
 					this[this.confirmDialog.successFunction](this.confirmDialog.parameters)
 				}
 				this.confirmDialog.visible = false
-			},
-			created () {
-
-				this.localBankAccounts = this.bankAccounts
-
-				let vm = this
-				this.$on("saveBankAccount",function(){
-					vm.alert.msg = "Bank account saved"
-					vm.alert.class = "alert-success"
-					vm.alert.visible = true
-				})
 			}
+		},
+		created () {
+			this.localBankAccounts = this.bankAccounts
+
+			let vm = this
+			this.$on("saveBankAccount",function(){
+				vm.alert.msg = "Bank account saved"
+				vm.alert.class = "alert-success"
+				vm.alert.visible = true
+			})
 		}
 	}
 </script>
