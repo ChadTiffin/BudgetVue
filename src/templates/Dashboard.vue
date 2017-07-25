@@ -289,9 +289,9 @@
 				
 			},
 			showTransactionModal (tran) {
-				
 				if (tran)
 					this.transactionData = {
+						id: tran.id,
 						description: tran.description,
 						tran_date: tran.tran_date,
 						amount: tran.amount,
@@ -699,6 +699,7 @@
 
 		.col2-control {
 			display: block;
+			width: 100%;
 			width: calc(100% + 30px);
 			margin-left: -15px
 		}

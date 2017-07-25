@@ -1,6 +1,6 @@
 <template>
 	
-	<select class="form-control" :name="name" v-on:change="change">
+	<select class="form-control" :name="name" v-on:change="change" v-on:input="updateValue($event.target.value)">
 		<option v-for="group in groups" :value="group.id">{{ group.name }}</option>
 	</select>
 	
@@ -13,6 +13,9 @@
 		methods: {
 			change () {
 				this.$emit("change")
+			},
+			updateValue(value) {
+				this.$emit("input",value)
 			}
 		}
 	}

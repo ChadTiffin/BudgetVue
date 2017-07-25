@@ -8,51 +8,53 @@
 
 		<div style="clear: both;"></div>
 
-		<table class="table table-striped table-condensed">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Account Description</th>
-					<th>Default</th>
-					<th>Tracked in Budget</th>
-					<th>Balance</th>
-					<th>Last Reconciled</th>
-					<th>Last Reconciled Balance</th>
-					<th></th>
-				</tr>	
-			</thead>
-			<draggable
-				element='tbody'
-				v-model="localBankAccounts"
-				v-on:update="saveOrder"
-				:options="{handle:'.sort-account'}">
+		<div style="overflow-x: auto">
+			<table class="table table-striped table-condensed">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Account Description</th>
+						<th>Default</th>
+						<th>Tracked in Budget</th>
+						<th>Balance</th>
+						<th>Last Reconciled</th>
+						<th>Last Reconciled Balance</th>
+						<th></th>
+					</tr>	
+				</thead>
+				<draggable
+					element='tbody'
+					v-model="localBankAccounts"
+					v-on:update="saveOrder"
+					:options="{handle:'.sort-account'}">
 
-				<tr v-for="account in localBankAccounts">
-					<td class="btn-col has-control">
-						<i class="fa fa-fw fa-arrows icon-button sort-account"></i>
-					</td>
-					<td>{{ account.description }}</td>
-					<td>
-						<i v-if="account.priority == 0" class="fa fa-bookmark"></i>
-					</td>
-					<td>
-						<i v-if="account.off_budget == 0" class="fa fa-check"></i>
-						<i v-else class="fa fa-times"></i>
-					</td>
-					<td class="number">{{ account.balance }}</td>
-					<td>{{ account.last_reconciled }}</td>
-					<td>{{ account.last_reconciled_balance }}</td>
-					<td>
-						<i v-if="account.off_budget == 0" class="fa fa-fw fa-bookmark icon-button" 
-						title="Make default account"
-						v-on:click="makeDefault(account)"></i>
-						<i class="fa fa-fw fa-placeholder icon-button"></i>
-						<i class="fa fa-fw fa-pencil icon-button" v-on:click="editAccount(account)"></i>
-						<i class="fa fa-fw fa-remove icon-button" v-on:click="deleteItem('bankAccount',account.id,'executeDelete')"></i>
-					</td>
-				</tr>
-			</draggable>
-		</table>
+					<tr v-for="account in localBankAccounts">
+						<td class="btn-col has-control">
+							<i class="fa fa-fw fa-arrows icon-button sort-account"></i>
+						</td>
+						<td>{{ account.description }}</td>
+						<td>
+							<i v-if="account.priority == 0" class="fa fa-bookmark"></i>
+						</td>
+						<td>
+							<i v-if="account.off_budget == 0" class="fa fa-check"></i>
+							<i v-else class="fa fa-times"></i>
+						</td>
+						<td class="number">{{ account.balance }}</td>
+						<td>{{ account.last_reconciled }}</td>
+						<td>{{ account.last_reconciled_balance }}</td>
+						<td>
+							<i v-if="account.off_budget == 0" class="fa fa-fw fa-bookmark icon-button" 
+							title="Make default account"
+							v-on:click="makeDefault(account)"></i>
+							<i class="fa fa-fw fa-placeholder icon-button"></i>
+							<i class="fa fa-fw fa-pencil icon-button" v-on:click="editAccount(account)"></i>
+							<i class="fa fa-fw fa-remove icon-button" v-on:click="deleteItem('bankAccount',account.id,'executeDelete')"></i>
+						</td>
+					</tr>
+				</draggable>
+			</table>
+		</div>
 
 		<spinner :spinner-visible="spinnerVisible"></spinner>
 

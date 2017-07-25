@@ -75,7 +75,7 @@
 								<td class="btn-col has-control">
 									<i class="fa fa-fw fa-arrows icon-button sort-income" v-if="budgetEditable"></i>
 								</td>
-								<td :class="{'has-control': budgetEditable}">
+								<td :class="{'has-control': budgetEditable}" >
 									<input 
 										v-if="income.descEditable && budgetEditable" 
 										v-on:blur="income.descEditable = false" 
@@ -88,7 +88,7 @@
 									<div v-else v-on:click="income.descEditable = true">{{ income.source }}</div>
 
 								</td>
-								<td class="number col-amounts" :class="{'has-control': budgetEditable}">
+								<td class="number col-amounts" :class="{'has-control': budgetEditable}" style="width: 120px">
 									<input type="number" 
 										v-if="budgetEditable"
 										step="0.01" 

@@ -22,7 +22,7 @@
 
 			<button 
 				v-on:click="toggleAdvancedFilteringPanel" 
-				class="btn btn-default">
+				class="btn btn-default toggle-advanced-filtering">
 				<i class="fa fa-search"></i> Toggle Advanced Filtering</a>
 			</button>
 
@@ -35,19 +35,26 @@
 								<label class="control-label col-md-3">Group</label>
 								<div class="input-group col-md-9">
 									<label class="input-group-addon">
-										<input type="checkbox" v-model="includeGroupFilter">
+										<input type="checkbox" v-model="includeGroupFilter" v-on:change="filterTransactions">
 									</label>
-									<GroupsSelect name="group_id" :groups="groups" v-on:change="filterTransactions"></GroupsSelect>
+									<GroupsSelect v-model="groupFilterId" :groups="groups" v-on:change="filterTransactions" v-on:click="filterTransactions"></GroupsSelect>
 								</div>
 							</div>
 
-							<div class="form-group">
+							<div class="form-group" v-if="includeGroupFilter">
 								<label class="control-label col-md-3">Category</label>
 								<div class="input-group col-md-9">
 									<label class="input-group-addon">
-										<input type="checkbox" v-model="includeCategoryFilter">
+										<input type="checkbox" v-model="includeCategoryFilter" v-on:change="filterTransactions">
 									</label>
-									<CategoriesSelect name="cat_id" :categories="categories" v-on:change="filterTransactions"></CategoriesSelect>
+									<select 
+										class="form-control" 
+										v-model="categoryFilterId" 
+										v-on:change="filterTransactions"
+										v-on:click="filterTransactions">
+
+										<option v-for="cat in filterGroupCategories" :value="cat.id">{{ cat.description }}</option>
+									</select>
 								</div>
 							</div>
 
@@ -177,10 +184,10 @@
 				transactions : [],
 				spinnerVisible : false,
 				filtering : {},
-				includeCategoryFilter: false,
 				includeGroupFilter: false,
-				catFilterValue: 0,
-				groupFilterValue: 0,
+				groupFilterId: 0,
+				includeCategoryFilter: false,
+				categoryFilterId: 0,
 				months: [ "January", "February", "March", "April", "May", "June",
 "July", "August", "September", "October", "November", "December" ],
 				activeFilterButton: -1,
@@ -219,6 +226,12 @@
 				else
 					this.showAdvancedFiltering = true
 			},
+			toggleGroupfilter() {
+
+			},
+			toggleCategoryFilter () {
+			
+			},
 			filterMonth(mon) {
 				this.resetFiltering()
 
@@ -248,12 +261,12 @@
 			},
 			filterTransactions() {
 				if (this.includeGroupFilter) 
-					this.filtering.group_id = document.querySelectorAll('select[name=group_id]')[0].value
+					this.filtering.group_id = this.groupFilterId
 				else
 					this.filtering.group_id = null
 
 				if (this.includeCategoryFilter)
-					this.filtering.cat_id = document.querySelectorAll('select[name=cat_id')[0].value
+					this.filtering.cat_id = this.categoryFilterId
 				else
 					this.filtering.cat_id = null
 
@@ -335,6 +348,18 @@
 			}
 		},
 		computed: {
+			filterGroupCategories() {
+
+				let vm = this
+				let categories = []
+				this.groups.forEach(function(group, index) {
+					if (vm.filtering.group_id == group.id) {
+						categories = group.categories
+					}
+				})
+
+				return categories
+			},
 			totalsDisplayed () {
 				let total_debit = 0
 				let total_credit = 0
@@ -440,6 +465,35 @@
 
 	.field-divider {
 		margin-bottom: 10px;
+	}
+
+	@media (max-width: 815px) {
+		.filtering .btn-group label.btn {
+			width: 14.27%;
+			text-align: center;
+		}
+
+		.toggle-advanced-filtering {
+			display: block;
+			width: 100%;
+			margin-top: 10px;
+
+		}
+	}
+
+	@media (max-width: 400px) {
+		.filtering .btn-group label.btn:nth-child(1),
+		.filtering .btn-group label.btn:nth-child(2) {
+			display: none;
+
+		}
+
+		.filtering .btn-group label.btn {
+			width: 16.667%;
+			margin: 0;
+			border-radius: 0!important;
+		}
+
 	}
 </style>
 
