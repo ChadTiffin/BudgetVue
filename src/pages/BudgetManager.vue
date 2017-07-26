@@ -7,7 +7,7 @@
 				<section>
 					<h2>Summary</h2>
 
-					<div class="panel panel-default">
+					<div class="panel panel-default" :class="{'fixed-top-left' : panelFixed }">
 						<div class="panel-heading">Planned</div>
 						<table class="table">
 							<tbody>
@@ -315,6 +315,7 @@
 				income_sources: [],
 				budgetEditable: true,
 				noBudgetFound: false,
+				panelFixed: false,
 				confirmDialog : {
 					visible: false,
 					title: "",
@@ -825,10 +826,20 @@
 						})
 					}
 				})
+			},
+			handleScroll() {
+				if (window.innerWidth > 600 && document.body.scrollTop > 150)
+					this.panelFixed = true
+				else
+					this.panelFixed = false
 			}
 		},
 		created () {
 			this.jumpToCurrentMonth()
+			window.addEventListener('scroll', this.handleScroll);
+		},
+		destroyed () {
+			window.removeEventListener('scroll', this.handleScroll);
 		}
 	}
 </script>
@@ -841,6 +852,13 @@
 
 	thead .btn-col {
 		width: 40px
+	}
+
+	.fixed-top-left {
+		position: fixed;
+		top: 50px;
+		box-shadow: 1px 1px 10px black;
+		z-index: 5;
 	}
 
 	.budget-tables table {
