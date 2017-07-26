@@ -1,7 +1,7 @@
 <template>
 
 	<!--<input type="date" :name="name" v-model="dateVal" class="form-control" :class="extraClasses" v-on:input="updateValue($event.target.value)">-->
-	<datepicker :name="name" v-model="dateVal" :input-class="extraClasses" format="yyyy-MM-dd"></datepicker>
+	<datepicker :name="name" :value="value" v-on:input="input($event)" :input-class="extraClasses" format="yyyy-MM-dd"></datepicker>
 
 </template>
 
@@ -16,6 +16,7 @@
 		},
 		computed: {
 			dateVal: function(e){
+				
 				if (this.value == null) {
 
 					var today = new Date();
@@ -38,8 +39,12 @@
 			}
 		},
 		methods: {
-			updateValue(value) {
-				this.$emit("input",value)
+			input(value) {
+
+				let date_string = value.getFullYear()+"-"+(value.getMonth()+1)+"-"+value.getDate()
+
+				this.$emit("input",date_string)
+				this.$emit("change")
 			}
 		}
 	}

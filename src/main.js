@@ -20,8 +20,8 @@ if ('serviceWorker' in navigator) {
 
 Vue.config.productionTip = false;
 
-//window.apiBase = "https://api.budget.chadtiffin.com/"
-window.apiBase = "https://budget-api.demos.chadtiffin.com/"
+window.apiBase = "https://api.budget.chadtiffin.com/"
+//window.apiBase = "https://budget-api.demos.chadtiffin.com/"
 
 Vue.mixin(Ajax)
 Vue.use(VueRouter);

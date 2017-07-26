@@ -86,7 +86,8 @@
 							<div class="form-group">
 								<label class="control-label col-md-3">Amounts</label>
 								<div class="col-md-9">
-									<input type="number" step="0.01" class="form-control  col2-control" name="amount_low" placeholder="Min $" v-on:change="filterTransactions" v-model="filtering.amount_low">
+									<input type="number" step="0.01" 
+									class="form-control  col2-control" name="amount_low" placeholder="Min $" v-on:change="filterTransactions" v-model="filtering.amount_low">
 									<input type="number" step="0.01" class="form-control  col2-control"  name="amount_high" placeholder="Max $"  v-on:change="filterTransactions" v-model="filtering.amount_high">
 								</div>
 							</div>
@@ -268,6 +269,7 @@
 				this.fetchTransactions(this.filtering)
 			},
 			filterTransactions() {
+
 				if (this.includeGroupFilter) 
 					this.filtering.group_id = this.groupFilterId
 				else
@@ -280,7 +282,6 @@
 
 				this.fetchTransactions(this.filtering)
 
-				console.log('filtered');
 			},
 			deleteItem(resource, id, executeFunction) {
 				
@@ -331,15 +332,10 @@
 				let vm = this
 
 				for (var key in filtering) {
-					console.log(filtering[key])
 					if (!filtering[key]) {
-						console.log(filtering[key])
 						filtering[key] = null
 					}
 				}
-
-				console.log("final filtering")
-				console.log(filtering)
 
 				this.spinnerVisible = true,
 				this.getJSON(window.apiBase + "transaction/get/"+filtering.date_from+"/"+filtering.date_to+"/"+filtering.group_id+"/"+filtering.cat_id+"/"+filtering.amount_low+"/"+filtering.amount_high+"/"+filtering.keyword+"/"+filtering.user_id).then(function(response){
@@ -443,10 +439,10 @@
 					message += " onwards"
 
 				if (this.filtering.amount_low != null)
-					message += " amounts between " + this.filtering.amount_low.tofixed(2) + " and"
+					message += " amounts between " + parseFloat(this.filtering.amount_low).tofixed(2) + " and"
 
 				if (this.filtering.amount_high != null)
-					message += " " + this.filtering.amount_high.toFixed(2)
+					message += " " + parseFloat(this.filtering.amount_high).toFixed(2)
 				else if (this.filtering.amount_low != null)
 					message += " above"
 
@@ -459,13 +455,8 @@
 		created () {
 			let vm = this
 
-			console.log("first")
-			console.log(this.filtering)
-
 			this.filtering.date_from = this.currentMonthFirstDay
 			this.filtering.date_to = this.currentMonthLastDay
-
-
 
 			//asign filtering url vars to filtering params
 			for (var key in this.$route.query) {
@@ -475,8 +466,6 @@
 				else
 					this.filtering[key] = this.$route.query[key]
 			}
-
-			console.log(this.filtering)
 
 			this.fetchTransactions(this.filtering)
 
