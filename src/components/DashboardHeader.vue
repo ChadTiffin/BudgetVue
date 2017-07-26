@@ -2,6 +2,7 @@
 	<header>
 		<div class="page-heading" :class="{ menuShowing: menuShowing }">
 			<div class="menu-button" v-on:click="toggleMenu"><i class="fa fa-navicon"></i></div>
+			<div class="side-menu-button menu-button" v-on:click="toggleMenu"><i class="fa fa-navicon"></i></div>
 			<h1><i class='fa' :class="pageIcon"></i> {{pageTitle}}</h1>
 
 			<transition
@@ -33,12 +34,13 @@
 				Menu 
 				<i class="fa pull-right" :class="{'fa-caret-down' : menuButtonsCollapsed, 'fa-caret-up' : !menuButtonsCollapsed}"></i>
 			</h2>
+			{{ userType }}
 			<ul class="menu-list" v-if="!menuButtonsCollapsed">
 				<li><a href="#" v-on:click.prevent="showModal"><i class="fa fa-fw fa-plus"></i> New Transaction</a></li>
 
 				<li v-if="!isOffline"><a href="#" v-on:click.prevent="showImportModal"><i class="fa fa-fw fa-download"></i> Import Transactions</a></li>
 
-				<li v-if="(!isOffline && page.nav) || (isOffline && page.offlinePage)"
+				<li v-if="(page.permRequired.indexOf(userType)) >= 0 && ((!isOffline && page.nav) || (isOffline && page.offlinePage))"
 					v-for="(page, key) in pagesMeta" >
 					<a :href="key" v-on:click.prevent="navigate(key)"><i class="fa fa-fw" :class="page.icon"></i> {{ page.title }}</a>
 				</li>
@@ -76,7 +78,7 @@
 						v-on:mouseleave="account.editButtonVisible = false"
 						v-on:click="showAccountsModal(account)">
 						<i class="fa fa-pencil" v-if="account.editButtonVisible == true"></i>
-						{{ account.description }}: <div class="bank-balance" :class="{ 'text-danger' : account.balance < 0, 'text-success': account.balance >= 0 }>$ {{ account.balance }}</div>
+						{{ account.description }}: <div class="bank-balance" :class="{ 'text-danger' : account.balance < 0, 'text-success': account.balance >= 0 }">$ {{ account.balance }}</div>
 					</li>
 					
 					<li class="total">Total <div class="bank-balance">$ {{ accountBalanceTotals.offBudget.toFixed(2) }}</div></li>
@@ -97,7 +99,8 @@
 		props: ['menuShowing','spinnerVisible','pageTitle','pageIcon','bankAccounts','pagesMeta','accountBalanceTotals','isOffline','transactionsSynced','alert'],
 		data () {
 			return {
-				menuButtonsCollapsed: false
+				menuButtonsCollapsed: false,
+				userType: localStorage.userType
 			}
 		},
 		computed: {
@@ -321,6 +324,10 @@
 		z-index: 50
 	}
 
+	.side-menu-button {
+		display: none;
+	}
+
 	@media (max-width: 1050px) {
 		.section-wrapper.menuShowing {
 			margin-left: 0;
@@ -330,6 +337,16 @@
 	@media (max-width: 450px) {
 		.header-flag span {
 			display: none;
+		}
+
+		.side-menu-button {
+			display: block;
+			opacity: 0;
+			position: fixed;
+			top: calc(50% - 20px);
+			right: 0;
+			z-index: 10;
+			color: #003540;
 		}
 	}
 </style>

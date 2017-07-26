@@ -119,7 +119,7 @@
 				let key = localStorage.apiKey
 				let vm = this
 
-				this.getJSON(window.apiBase + "user/find/"+key+"/api_key").then(function(response) {
+				this.getJSON(window.apiBase + "user/self/"+key).then(function(response) {
 					
 					vm.user = response
 				})

@@ -1,9 +1,6 @@
 <template>
 
 	<section>
-
-		<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
-
 		<p><button class="btn btn-success" v-on:click="addGroup"><i class="fa fa-plus"></i> New Group</button></p>
 
 		<div style="clear: both;"></div>

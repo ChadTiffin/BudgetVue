@@ -6,9 +6,9 @@ import Dashboard from './templates/Dashboard'
 import Public from './templates/Public'
 import Ajax from './ajax'
 
-/*if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js').then(function(registration) {
+    navigator.serviceWorker.register('/sw.js').then(function(registration) {
       // Registration was successful
       console.log('ServiceWorker registration successful with scope: ', registration.scope);
     }, function(err) {
@@ -16,11 +16,12 @@ import Ajax from './ajax'
       console.log('ServiceWorker registration failed: ', err);
     });
   });
-}*/
+}
 
 Vue.config.productionTip = false;
 
-window.apiBase = "https://api.budget.chadtiffin.com/"
+//window.apiBase = "https://api.budget.chadtiffin.com/"
+window.apiBase = "https://budget-api.demos.chadtiffin.com/"
 
 Vue.mixin(Ajax)
 Vue.use(VueRouter);

@@ -331,10 +331,15 @@
 				let vm = this
 
 				for (var key in filtering) {
-					if (filtering[key] == null || filtering[key] == 0 || filtering[key] == "") {
+					console.log(filtering[key])
+					if (!filtering[key]) {
+						console.log(filtering[key])
 						filtering[key] = null
 					}
 				}
+
+				console.log("final filtering")
+				console.log(filtering)
 
 				this.spinnerVisible = true,
 				this.getJSON(window.apiBase + "transaction/get/"+filtering.date_from+"/"+filtering.date_to+"/"+filtering.group_id+"/"+filtering.cat_id+"/"+filtering.amount_low+"/"+filtering.amount_high+"/"+filtering.keyword+"/"+filtering.user_id).then(function(response){
@@ -454,10 +459,24 @@
 		created () {
 			let vm = this
 
-			this.resetFiltering()
+			console.log("first")
+			console.log(this.filtering)
 
 			this.filtering.date_from = this.currentMonthFirstDay
 			this.filtering.date_to = this.currentMonthLastDay
+
+
+
+			//asign filtering url vars to filtering params
+			for (var key in this.$route.query) {
+
+				if (this.$route.query[key] == 'undefined')
+					this.filtering[key] = null
+				else
+					this.filtering[key] = this.$route.query[key]
+			}
+
+			console.log(this.filtering)
 
 			this.fetchTransactions(this.filtering)
 

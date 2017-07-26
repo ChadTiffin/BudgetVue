@@ -20,7 +20,7 @@
 			>
 		</DashboardHeader>
 
-		<div class="section-wrapper" :class="{ menuShowing: menuShowing }">
+		<div class="section-wrapper" :class="{ menuShowing: menuShowing }" v-on:click="hideMenu">
 			
 			<CategoryManager 
 				v-if="currentRoute == '/categories'" 
@@ -117,7 +117,7 @@
 			<div v-if="reconcileAccount">
 				<FormGroup label="Reconciled" col-class="col-md-4">
 					<DateField 
-						v-model="modalBankAccount.reconcile_date">
+						v-model="modalBankAccount.reconcile_date" extra-classes="form-control">
 					</DateField>
 				</FormGroup>
 
@@ -247,46 +247,53 @@
 						title: "Budget",
 						icon: "fa-pie-chart",
 						nav: true,
-						offlinePage: true
+						offlinePage: true,
+						permRequired: ['User','Admin','Root']
 					},
 					"/transactions" : {
 						title: "Transaction Log",
 						icon: "fa-list-ul",
 						nav: true,
-						offlinePage: true
+						offlinePage: true,
+						permRequired: ['User','Admin','Root']
 					},
 					"/clear-imported-transactions" : {
 						title: "Clear Pending Imports",
 						icon: "fa-clock-o",
 						nav: false,
-						offlinePage: false
+						offlinePage: false,
+						permRequired: ['User','Admin','Root']
 					},
 					"/categories" : {
 						title: "Categories & Groups",
 						icon: "fa-tags",
 						nav: true,
-						offlinePage: false
+						offlinePage: false,
+						permRequired: ['User','Admin','Root']
 					},
 					"/accounts" : {
 						title: "Bank Accounts",
 						icon: "fa-bank",
 						nav: true,
-						offlinePage: false
+						offlinePage: false,
+						permRequired: ['User','Admin','Root']
 					},
 					'/my-profile' : {
 						title: "My Profile",
 						icon: "fa-user-circle",
 						nav: true,
-						offlinePage: false
+						offlinePage: false,
+						permRequired: ['User','Admin','Root']
 					},
 					"/users" : {
 						title : "Users",
 						icon: "fa-users",
 						nav: true,
-						offlinePage: false
+						offlinePage: false,
+						permRequired: ['Admin','Root']
 					}
 				},
-				currentRoute: this.$route.fullPath,
+				currentRoute: "/"+this.$route.fullPath.split("?")[0].split("/")[1],
 				isOffline: false,
 				transactionsSynced: false
 			}
@@ -342,6 +349,10 @@
 				}
 
 				this.transactionModalVisible = true;
+			},
+			hideMenu() {
+				if (window.innerWidth < 1050 && this.menuShowing)
+					this.menuShowing = false
 			},
 			closeTransactionModal: function(e) {
 				this.transactionModalVisible = false;

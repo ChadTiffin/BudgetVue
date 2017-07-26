@@ -94,6 +94,9 @@
 							vm.loginAlert.msg = "Login successful, redirecting..."
 							vm.loginAlert.class = "alert-success"
 
+							//save user type to local storage
+							localStorage.userType = response.userType
+
 							window.location = "/budget"
 						}
 						else {

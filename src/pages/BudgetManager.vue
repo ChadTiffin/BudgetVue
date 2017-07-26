@@ -260,7 +260,7 @@
 								<i v-if="cat.description != 'Surplus' && budgetEditable" class="fa fa-fw fa-arrows icon-button sort-row"></i> 
 							</td>
 							<td class="td-indent" :class="{'has-control':cat.descEditable && cat.description != 'Surplus' }">
-								{{ cat.description }}
+								<a :href="cat.link">{{ cat.description }}</a>
 							</td>
 							<td :class="{'has-control': budgetEditable}" class="number">
 								<input v-if="cat.description != 'Surplus' && budgetEditable" type="number" step="0.01" name="amount_alloc" placeholder="$ 0.00" class="form-control" v-on:change="autoSave(cat, 'budget', 'save')" v-model="cat.amount_alloc" >
@@ -409,6 +409,16 @@
 							vm.grandTotals.actualSurplus = cat.balanceAfterInjection ? parseFloat(cat.balanceAfterInjection) : 0
 
 						vm.$set(cat,'descEditable',false)
+
+						let d = new Date()
+						let last_day_of_month = new Date(vm.budget_year, d.getMonth() + 1, 0)
+						last_day_of_month = last_day_of_month.getDate()
+
+						let lastDay = vm.budget_year + "-" + vm.budget_month + "-" + last_day_of_month
+
+						let link = "/transactions?group_id="+group.id+"&cat_id="+cat.id+"&date_from="+vm.budget_year+"-"+vm.budget_month+"-01&date_to="+lastDay
+
+						vm.$set(cat,'link',link)
 					})
 
 					group['totalAlloc'] = totalAlloc
@@ -859,6 +869,18 @@
 		top: 50px;
 		box-shadow: 1px 1px 10px black;
 		z-index: 5;
+		animation: slideDownFixed 1s;
+	}
+
+	@keyframes slideDownFixed {
+		from {
+			top: -100px;
+			
+		}
+
+		to {
+			top: 50px;
+		}
 	}
 
 	.budget-tables table {
