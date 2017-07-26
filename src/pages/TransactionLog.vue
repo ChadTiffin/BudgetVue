@@ -1,7 +1,6 @@
 <template>
 <div>
 	<section>
-		<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
 		<div class="filtering" v-if="!isOffline">
 
 			<div class="btn-group" data-toggle="buttons" style="display: inline-block;">
@@ -65,8 +64,22 @@
 							<div class="form-group">
 								<label class="control-label col-md-3">Date Range</label>
 								<div class="col-md-9">
-									<input type="date" class="form-control col2-control" name="date_from" v-on:change="filterTransactions" v-model="filtering.date_from">
-									<input type="date" class="form-control col2-control"  name="date_to" v-on:change="filterTransactions" v-model="filtering.date_to">
+									<!--<input type="date" class="form-control col2-control" name="date_from" v-on:change="filterTransactions" v-model="filtering.date_from">
+									<input type="date" class="form-control col2-control"  name="date_to" v-on:change="filterTransactions" v-model="filtering.date_to">-->
+									<DateField 
+										v-model="filtering.date_from"
+										v-on:change="filterTransactions"
+										name="date_from"
+										extra-classes="form-control"
+										class="col2-control">
+									</DateField>
+									<DateField 
+										v-model="filtering.date_to"
+										v-on:change="filterTransactions"
+										name="date_to"
+										extra-classes="form-control"
+										class="col2-control">
+									</DateField>
 								</div>
 							</div>
 
@@ -198,11 +211,6 @@
 					message: "",
 					successFunction : "",
 					parameters: ""
-				},
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
 				}
 			}
 		},
@@ -271,6 +279,8 @@
 					this.filtering.cat_id = null
 
 				this.fetchTransactions(this.filtering)
+
+				console.log('filtered');
 			},
 			deleteItem(resource, id, executeFunction) {
 				
@@ -300,20 +310,20 @@
 				let vm = this
 
 				this.postData(window.apiBase + parameters.resource + "/delete",payload).then(function(response) {
+
+					let alert_msg = "Item deleted"
 					if (response.status == 'success') {
-
-						vm.alert.msg = "Item deleted"
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
-
 						vm.fetchTransactions(vm.filtering)
 					}
 					else {
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
 						vm.alert.msg = response.msg
-
 					}
+
+					vm.$emit("alertUpdate",{
+						class: "alert-danger",
+						msg: alert_msg,
+						visible: true
+					})
 					
 				})
 			},

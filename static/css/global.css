@@ -1,3 +1,28 @@
+
+@media (max-width: 500px) {
+	.modal-dialog {
+		margin: 0;
+	}
+
+	.modal-footer, .modal-header {
+		padding: 10px;
+		padding-left: 15px;
+	}
+
+	.modal-title {
+		font-size: 26px;
+		line-height: 1;
+	}
+
+	.modal-dialog .form-group {
+		margin-bottom: 8px;
+	}
+
+	.modal-dialog label {
+		margin-bottom: 2px;
+	}
+}
+
 @media (max-height: 800px) {
 	.modal-body {
 		overflow-y: auto;

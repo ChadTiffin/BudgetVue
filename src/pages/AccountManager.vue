@@ -2,8 +2,6 @@
 
 	<section>
 
-		<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
-
 		<p><button class="btn btn-success" v-on:click="newAccount"><i class="fa fa-plus"></i> New Account</button></p>
 
 		<div style="clear: both;"></div>
@@ -87,11 +85,6 @@
 		data () {
 			return {
 				localBankAccounts: [],
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
-				},
 				confirmDialog : {
 					visible: false,
 					title: "",
@@ -119,9 +112,11 @@
 					if (response.status == "success") {
 						vm.$emit("fetchAccounts")
 
-						vm.alert.msg = "New default account set"
-						vm.alert.class = "alert-success"
-						vm.alert.visible = true
+						vm.$emit("alertUpdate",{
+							class: "alert-success",
+							msg: "New default account set",
+							visible: true
+						})
 					}
 				});
 			},
@@ -142,15 +137,22 @@
 					list: JSON.stringify(list)
 				}
 
-				this.alert.msg = "Saving..."
-				this.alert.class = "alert-warning"
-				this.alert.visible = true
+				this.$emit("alertUpdate",{
+					class: "alert-success",
+					msg: "Saving...",
+					visible: true
+				})
 
 				this.postData(window.apiBase+"bankAccount/save-order",payload).then(function(response){
 					if (response.status == 'success') {
-						vm.alert.class = 'alert-success'
+					
 						let d = new Date()
-						vm.alert.msg = "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds()
+
+						vm.$emit("alertUpdate",{
+							class: "alert-success",
+							msg: "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds(),
+							visible: true
+						})
 					}
 				})
 
@@ -179,16 +181,20 @@
 				this.postData(window.apiBase + parameters.resource + "/delete",payload).then(function(response) {
 					if (response.status == 'success') {
 
-						vm.alert.msg = "Item deleted"
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
+						vm.$emit("alertUpdate",{
+							class: "alert-danger",
+							msg: "Item deleted",
+							visible: true
+						})
 
 						vm.$emit("fetchAccounts")
 					}
 					else {
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
-						vm.alert.msg = response.msg
+						vm.$emit("alertUpdate",{
+							class: "alert-danger",
+							msg: response.msg,
+							visible: true
+						})
 
 					}
 					
@@ -206,9 +212,11 @@
 
 			let vm = this
 			this.$on("saveBankAccount",function(){
-				vm.alert.msg = "Bank account saved"
-				vm.alert.class = "alert-success"
-				vm.alert.visible = true
+				vm.$emit("alertUpdate",{
+					class: "alert-success",
+					msg: "Bank account saved",
+					visible: true
+				})
 			})
 		}
 	}

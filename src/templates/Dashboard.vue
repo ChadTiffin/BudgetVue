@@ -1,5 +1,6 @@
 <template>
 	<div class="dashboard">
+
 		<DashboardHeader
 			v-on:showModal="showTransactionModal"
 			:menu-showing="menuShowing"
@@ -11,10 +12,12 @@
 			:accountBalanceTotals="accountBalanceTotals"
 			:is-offline="isOffline"
 			:transactions-synced="transactionsSynced"
+			:alert="alert"
 			v-on:navigate="navigate"
 			v-on:toggleMenu="toggleMenu"
 			v-on:showAccountsModal="showAccountsModal"
-			v-on:showImportModal="importModalVisible = true">
+			v-on:showImportModal="importModalVisible = true"
+			>
 		</DashboardHeader>
 
 		<div class="section-wrapper" :class="{ menuShowing: menuShowing }">
@@ -22,17 +25,20 @@
 			<CategoryManager 
 				v-if="currentRoute == '/categories'" 
 				:groups="masterGroups"
-				v-on:fetchGroups="fetchGroups">
+				v-on:fetchGroups="fetchGroups"
+				v-on:alertUpdate="updateAlert">
 			</CategoryManager>
 			<AccountManager 
 				v-if="currentRoute == '/accounts'" 
 				:bank-accounts="bankAccounts"
 				v-on:fetchAccounts="fetchBankAccounts"
 				v-on:editAccount="showAccountsModal"
+				v-on:alertUpdate="updateAlert"
 			>
 			</AccountManager>
 			<UserManager 
 				v-if="currentRoute == '/users'" 
+				v-on:alertUpdate="updateAlert"
 			>
 			</UserManager>
 			<TransactionLog 
@@ -41,22 +47,25 @@
 				:categories='masterCategories'
 				:is-offline="isOffline"
 				v-on:showTransactionModal="showTransactionModal"
-
+				v-on:alertUpdate="updateAlert"
 				>
 			</TransactionLog>
 			<BudgetManager 
 				v-if="currentRoute == '/' || currentRoute == '/budget'" 
 				:master-groups="masterGroups" 
 				:accountBalanceTotals="accountBalanceTotals"
-				:is-offline="isOffline">
+				:is-offline="isOffline"
+				v-on:alertUpdate="updateAlert">
 			</BudgetManager>
 			<TransactionClearing 
 				v-if="currentRoute == '/clear-imported-transactions'"
 				:bank-accounts="bankAccounts"
-				:groups = "masterGroups" >
+				:groups = "masterGroups" 
+				v-on:alertUpdate="updateAlert">
 			</TransactionClearing>
 			<MyProfile 
-				v-if="currentRoute == '/my-profile'">
+				v-if="currentRoute == '/my-profile'"
+				v-on:alertUpdate="updateAlert">
 			</MyProfile>
 			
 		</div>
@@ -196,6 +205,12 @@
 			return {
 				loggedIn: false,
 				transactionModalVisible: false,
+				alert: {
+					msg: "",
+					class: "",
+					visible: false,
+					errors: []
+				},
 				transactionData: {
 					description: "",
 					tran_date: null,
@@ -287,6 +302,20 @@
 				if (window.innerWidth <= 1400)
 					this.menuShowing = false
 				
+			},
+			updateAlert(alertData) {
+				this.alert = alertData
+
+				let vm = this
+
+				//make notification go away after a few seconds
+				setTimeout(function(){
+					vm.alert = {
+						msg: "",
+						class: "",
+						visible: false
+					}
+				},4000)
 			},
 			showTransactionModal (tran) {
 				if (tran)
@@ -702,6 +731,11 @@
 			width: 100%;
 			width: calc(100% + 30px);
 			margin-left: -15px
+		}
+
+		.vdp-datepicker {
+			display: inline-block;
+			width: auto;
 		}
 	}
 </style>

@@ -146,9 +146,9 @@
 				</div>
 			</div>
 			<div class="col-md-4">
-				<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }} &nbsp;
+				<!--<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }} &nbsp;
 					<button v-if="noBudgetFound" class='btn btn-primary' v-on:click="copyBudget">Copy Budget</button>
-				</div>
+				</div>-->
 			</div>
 		</div>
 
@@ -315,11 +315,6 @@
 				income_sources: [],
 				budgetEditable: true,
 				noBudgetFound: false,
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
-				},
 				confirmDialog : {
 					visible: false,
 					title: "",
@@ -592,16 +587,21 @@
 				this.postData(window.apiBase + parameters.resource + "/delete",payload).then(function(response) {
 					if (response.status == 'success') {
 
-						vm.alert.msg = "Item deleted"
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
+						vm.$emit("alertUpdate",{
+							class: "alert-danger",
+							msg: "Item deleted",
+							visible: true
+						})
 
 						vm.fetchBudget()
 					}
 					else {
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
-						vm.alert.msg = response.msg
+
+						vm.$emit("alertUpdate",{
+							class: "alert-danger",
+							msg: response.msg,
+							visible: true
+						})
 
 					}
 					
@@ -622,28 +622,31 @@
 
 					vm.spinnerVisible = false
 
+					let alert_class = "alert-danger"
+					let alert_msg = ""
+					let alert_visible = true
+
 					if (json.status == "failed") {
 
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
-
 						if (json.error == "not found") {
-							vm.noBudgetFound = true
-							vm.alert.msg = "There is no budget for this month. Would you like to copy over the last budget?"
+
+							vm.confirmDialog.message = "There is no budget for this month. Would you like to copy over the previous budget?"
+							vm.confirmDialog.title = "Copy Last Budget?"
+							vm.confirmDialog.successFunction = "copyBudget"
+							vm.confirmDialog.buttonText = "Copy Budget"
+							vm.confirmDialog.visible = true
 
 							vm.groups = []
 							vm.income_sources = []
 						}
 						else {
-							vm.alert.msg = json.message
+							alert_msg = json.message
 						}
 						
 					}
 					else if (json.status == "offline") {
 
-						vm.alert.class ="alert-danger"
-						vm.alert.visible = true
-						vm.alert.msg = "You appear to be offline, the displayed budget may not be 100% current."
+						alert_msg = "You appear to be offline, the displayed budget may not be 100% current."
 
 						vm.localIsOffline = true
 						vm.budgetEditable = false
@@ -666,19 +669,27 @@
 						localStorage.budgetThisMonthIncome = json.total_income
 						localStorage.budgetLastSavedLocally = currentDate
 
-						vm.alert.visible = false
+						alert_visible = false
 
 						vm.setBudgetEditState()
 					}
+
+					vm.$emit("alertUpdate",{
+						class: alert_class,
+						msg: alert_msg,
+						visible: alert_visible
+					})
 					
 				})
 			},
 			copyBudget () {
 				let vm = this
 
-				this.alert.msg = "Copying last budget..."
-				this.alert.class = "alert-warning"
-				this.alert.visible = true
+				vm.$emit("alertUpdate",{
+					class: "alert-warning",
+					msg: "Copying last budget...",
+					visible: true
+				})
 
 				this.noBudgetFound = false
 
@@ -687,21 +698,19 @@
 					month: this.budget_month
 				}
 
-				this.alert.msg = "Copying budget..."
-				this.alert.class = "alert-warning"
-				this.alert.visible = true
-
 				this.postData(window.apiBase + "budget/copy-last", payload).then(function(response) {
+					
+					let alert_class = "alert-danger"
 					if (response.status == 'success') {
-						vm.alert.class = "alert-success"
+						alert_class = "alert-success"
 						vm.fetchBudget()
 					}
-					else {
-						vm.alert.class = "alert-danger"
 
-					}
-					vm.alert.visible = true
-					vm.alert.msg = response.msg
+					vm.$emit("alertUpdate",{
+						class: alert_class,
+						msg: response.msg,
+						visible: true
+					})
 				})
 			},
 			autoSave (data, resource, method) {
@@ -794,20 +803,26 @@
 					}
 				}
 
-				this.alert.msg = "Saving..."
-				this.alert.class = "alert-warning"
-				this.alert.visible = true
+				vm.$emit("alertUpdate",{
+					class: "alert-warning",
+					msg: "Saving...",
+					visible: true
+				})
 
 				this.postData(window.apiBase + resource + "/" + method, payload).then(function(response){
 
 					if (response.status == 'success') {
-						vm.alert.class = 'alert-success'
 
 						//update id that was sent down in case of a create
 						data.id = response.id
 
 						let d = new Date()
-						vm.alert.msg = "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds()
+
+						vm.$emit("alertUpdate",{
+							class: "alert-success",
+							msg: "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds(),
+							visible: true
+						})
 					}
 				})
 			}

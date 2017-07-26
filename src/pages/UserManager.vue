@@ -2,8 +2,6 @@
 
 	<section>
 
-		<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
-
 		<p><button class="btn btn-success" v-on:click="newUser"><i class="fa fa-plus"></i> New User</button></p>
 
 		<div style="clear: both;"></div>
@@ -121,11 +119,6 @@
 		},
 		data () {
 			return {
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
-				},
 				confirmDialog : {
 					visible: false,
 					title: "",
@@ -183,6 +176,12 @@
 					
 					if (response.status == "success") {
 						vm.userDialog.visible = false
+
+						vm.$emit("alertUpdate",{
+							class: "alert-success",
+							msg: "User details saved",
+							visible: true
+						})
 
 						vm.fetchUsers()
 					}

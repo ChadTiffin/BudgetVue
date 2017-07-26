@@ -6,7 +6,6 @@
 			<div class="col-md-6 avatar">
 				<i class="fa fa-user-circle"></i>
 
-				<div style="margin-top: 20px;" class="alert" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
 			</div>
 			<div class="col-md-6">
 
@@ -89,11 +88,6 @@
 				user: {},
 				spinnerVisible: false,
 				changePasswordUrl: window.apiBase+"auth/password/change",
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
-				}
 			}
 		},
 		methods: {
@@ -101,19 +95,23 @@
 				let vm = this
 
 				this.postForm('change-password').then(function(response){
-					if (response.status == "success") {
-						vm.alert.msg = "Password change successfully"
-						vm.alert.visible = true,
-						vm.alert.class="alert-success"
+					
+					let alert_msg = "Password changed successfully"
+					let alert_class = "alert-success"
 
+					if (response.status == "success") {
 						document.getElementById('change-password').reset();
 					}
 					else {
-						vm.alert.msg = response.msg
-						vm.alert.visible = true,
-						vm.alert.class="alert-danger"
+						alert_msg = response.msg
+						alert_class = "alert-danger"
 					}
 
+					vm.$emit("alertUpdate",{
+						class: alert_class,
+						msg: alert_msg,
+						visible: true
+					})
 
 				})
 			},

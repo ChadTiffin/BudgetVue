@@ -2,10 +2,6 @@
 
 	<section>
 
-		<div class="alert pull-right" :class="alert.class" v-if="alert.visible">{{ alert.msg }}</div>
-
-		<div style="clear: both;"></div>
-
 		<form v-on:submit.prevent="submitImports">
 
 			<label class="control-label">Account to Import To</label>
@@ -94,11 +90,6 @@
 			return {
 				transactions: [],
 				account_id : 0,
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
-				},
 				spinnerVisible: false,
 				selectAllToggle: false
 			}
@@ -126,6 +117,13 @@
 				}
 
 				this.postData(window.apiBase+"import/merge",payload).then(function(response){
+
+					vm.$emit("alertUpdate",{
+						class: "alert-success",
+						msg: "Transactions posted",
+						visible: true
+					})
+
 					vm.fetchPendingTransactions()
 				})
 			},
@@ -134,6 +132,12 @@
 
 				this.postData(window.apiBase + "/import/purge",{purge: true}).then(function(response){
 					vm.fetchPendingTransactions()
+
+					vm.$emit("alertUpdate",{
+						class: "alert-success",
+						msg: "Pending transactions purged",
+						visible: true
+					})
 				})
 			},
 			fetchPendingTransactions() {

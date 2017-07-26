@@ -80,11 +80,6 @@
 			return {
 				spinnerVisible: false,
 				localGroups: [],
-				alert : {
-					visible: false,
-					msg: "",
-					class: ""
-				},
 				confirmDialog : {
 					visible: false,
 					title: "",
@@ -158,20 +153,20 @@
 				let vm = this
 
 				this.postData(window.apiBase + parameters.resource + "/delete",payload).then(function(response) {
+
+					let alert_msg = "Item deleted"
 					if (response.status == 'success') {
-
-						vm.alert.msg = "Item deleted"
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
-
 						vm.$emit("fetchGroups")
 					}
 					else {
-						vm.alert.class = "alert-danger"
-						vm.alert.visible = true
-						vm.alert.msg = response.msg
-
+						alert_msg = response.msg
 					}
+
+					vm.$emit("alertUpdate",{
+						class: "alert-danger",
+						msg: alert_msg,
+						visible: true
+					})
 					
 				})
 			},
@@ -216,20 +211,27 @@
 					}
 				}
 
-				this.alert.msg = "Saving..."
-				this.alert.class = "alert-warning"
-				this.alert.visible = true
+				vm.$emit("alertUpdate",{
+					class: "alert-warning",
+					msg: "Saving...",
+					visible: true
+				})
 
 				this.postData(window.apiBase + resource + "/" + method, payload).then(function(response){
 
 					if (response.status == 'success') {
-						vm.alert.class = 'alert-success'
-
+					
 						//update id that was sent down in case of a create
 						data.id = response.id
 
 						let d = new Date()
-						vm.alert.msg = "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds()
+						
+						vm.$emit("alertUpdate",{
+							class: "alert-success",
+							msg: "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds(),
+							visible: true
+						})
+
 					}
 				})
 			},

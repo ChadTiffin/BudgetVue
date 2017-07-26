@@ -43,7 +43,8 @@
 								<DateField 
 									v-model="localFieldData.tran_date"
 									v-on:input="updateValue"
-									name="tran_date">
+									name="tran_date"
+									extra-classes="form-control">
 								</DateField>
 							</FormGroup>
 
@@ -104,7 +105,8 @@
 								<DateField 
 									v-model="transferFieldData.tran_date"
 									v-on:input="updateValue"
-									name="tran_date">
+									name="tran_date"
+									extra-classes="form-control">
 								</DateField>
 							</FormGroup>
 
@@ -344,7 +346,7 @@
 	}
 
 	.radio.tran-type {
-		margin-bottom: 25px;
+		margin-bottom: 15px;
 	}
 
 	.radio label {

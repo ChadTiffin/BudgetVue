@@ -1,13 +1,19 @@
 <template>
 
-	<input type="date" :name="name" v-model="dateVal" class="form-control" :class="extraClasses" v-on:input="updateValue($event.target.value)">
+	<!--<input type="date" :name="name" v-model="dateVal" class="form-control" :class="extraClasses" v-on:input="updateValue($event.target.value)">-->
+	<datepicker :name="name" v-model="dateVal" :input-class="extraClasses" format="yyyy-MM-dd"></datepicker>
 
 </template>
 
 <script type="text/javascript">
+	import Datepicker from 'vuejs-datepicker'
+
 	export default {
 		name: "DateField",
 		props: ["name","extraClasses","value"],
+		components: {
+			Datepicker
+		},
 		computed: {
 			dateVal: function(e){
 				if (this.value == null) {
@@ -38,3 +44,14 @@
 		}
 	}
 </script>
+
+<style type="text/css">
+	.vdp-datepicker .vdp-datepicker__calendar .cell {
+		line-height: 30px;
+		height: 30px;
+	}
+
+	.vdp-datepicker .vdp-datepicker__calendar {
+		width: 250px;
+	}
+</style>

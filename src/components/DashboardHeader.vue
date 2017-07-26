@@ -83,7 +83,10 @@
 				</ul>
 			</div>
 		</nav>
-
+		<div class="alert main-alert" :class="alert.class" v-if="alert.visible">
+			{{ alert.msg }}
+			<p v-if="alert.errors">{{ alert.errors }}</p>
+		</div>
 	</header>
 </template>
 
@@ -91,7 +94,7 @@
 
 	export default {
 		name: 'DashboardHeader',
-		props: ['menuShowing','spinnerVisible','pageTitle','pageIcon','bankAccounts','pagesMeta','accountBalanceTotals','isOffline','transactionsSynced'],
+		props: ['menuShowing','spinnerVisible','pageTitle','pageIcon','bankAccounts','pagesMeta','accountBalanceTotals','isOffline','transactionsSynced','alert'],
 		data () {
 			return {
 				menuButtonsCollapsed: false
@@ -309,6 +312,13 @@
 
 	header .text-success {
 		color: #60ef62;
+	}
+
+	.main-alert {
+		position: fixed;
+		top: 5px;
+		right: 5px;
+		z-index: 50
 	}
 
 	@media (max-width: 1050px) {
