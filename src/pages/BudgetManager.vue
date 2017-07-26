@@ -839,6 +839,10 @@
 		background-color: #e0e0e0;
 	}
 
+	thead .btn-col {
+		width: 40px
+	}
+
 	.budget-tables table {
 		min-width: 750px
 	}

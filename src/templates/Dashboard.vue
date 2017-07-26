@@ -31,7 +31,7 @@
 			<AccountManager 
 				v-if="currentRoute == '/accounts'" 
 				:bank-accounts="bankAccounts"
-				v-on:fetchAccounts="fetchBankAccounts"
+				v-on:bankAccountsChange="fetchBankAccounts"
 				v-on:editAccount="showAccountsModal"
 				v-on:alertUpdate="updateAlert"
 			>

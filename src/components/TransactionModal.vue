@@ -78,7 +78,7 @@
 							</FormGroup>
 
 							<FormGroup label="Amount" col-class="col-md-4">
-								<input type="number" v-model="localFieldData.amount" step="0.01" name="amount" class="form-control">
+								<input type="number" v-model="localFieldData.amount" step="0.01" name="amount" class="form-control" required>
 							</FormGroup>
 
 							<FormGroup label="" col-class="col-md-4">
@@ -133,7 +133,7 @@
 							</FormGroup>
 
 							<FormGroup label="Amount" col-class="col-md-4">
-								<input type="number" v-model="transferFieldData.amount" step="0.01" name="amount" class="form-control">
+								<input type="number" v-model="transferFieldData.amount" step="0.01" name="amount" class="form-control" required>
 							</FormGroup>
 						</div>
 					</transition>
@@ -194,7 +194,8 @@
 			DateField
 		},
 		watch: {
-			fieldData() {
+			modalVisible() {
+
 				let localFieldData = {}
 
 				var tran_date
@@ -220,15 +221,10 @@
 
 					let account_id = 0
 
-					if (typeof this.fieldData.account_id == 'undefined' || !this.fieldData.account_id) {
-
-						this.bankAccounts.forEach(function(account,index){
-							if (account.priority == 0)
-								account_id = account.id
-						})
-					}
-					else
-						account_id = this.fieldData.account_id
+					this.bankAccounts.forEach(function(account,index){
+						if (account.priority == 0)
+							account_id = account.id
+					})
 
 					localFieldData = {
 						amount: this.fieldData.amount,
@@ -246,6 +242,9 @@
 				this.localFieldData = localFieldData
 
 			}
+		},
+		created() {
+
 		},
 		methods : {
 			closeModal: function(e) {
@@ -324,6 +323,7 @@
 						if ("errors" in response){
 							vm.alert.errors = response.errors
 							vm.alert.hasErrors = true
+							vm.alert.msg = ""
 						}
 
 						vm.$emit("isOnline")

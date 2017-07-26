@@ -12,7 +12,6 @@
 					<tr>
 						<th></th>
 						<th>Account Description</th>
-						<th>Default</th>
 						<th>Tracked in Budget</th>
 						<th>Balance</th>
 						<th>Last Reconciled</th>
@@ -32,20 +31,13 @@
 						</td>
 						<td>{{ account.description }}</td>
 						<td>
-							<i v-if="account.priority == 0" class="fa fa-bookmark"></i>
-						</td>
-						<td>
 							<i v-if="account.off_budget == 0" class="fa fa-check"></i>
 							<i v-else class="fa fa-times"></i>
 						</td>
 						<td class="number">{{ account.balance }}</td>
 						<td>{{ account.last_reconciled }}</td>
-						<td>{{ account.last_reconciled_balance }}</td>
+						<td class="number">{{ account.last_reconciled_balance }}</td>
 						<td>
-							<i v-if="account.off_budget == 0" class="fa fa-fw fa-bookmark icon-button" 
-							title="Make default account"
-							v-on:click="makeDefault(account)"></i>
-							<i class="fa fa-fw fa-placeholder icon-button"></i>
 							<i class="fa fa-fw fa-pencil icon-button" v-on:click="editAccount(account)"></i>
 							<i class="fa fa-fw fa-remove icon-button" v-on:click="deleteItem('bankAccount',account.id,'executeDelete')"></i>
 						</td>
@@ -101,25 +93,6 @@
 			}
 		},
 		methods: {
-			makeDefault(account) {
-				let payload = {
-					id: account.id
-				}
-
-				let vm = this
-
-				this.postData(window.apiBase+"bankAccount/make-default",payload).then(function(response) {
-					if (response.status == "success") {
-						vm.$emit("fetchAccounts")
-
-						vm.$emit("alertUpdate",{
-							class: "alert-success",
-							msg: "New default account set",
-							visible: true
-						})
-					}
-				});
-			},
 			editAccount(account) {
 				this.$emit("editAccount",account)
 			},
@@ -128,12 +101,13 @@
 			},
 			saveOrder() {
 
+				let vm = this
 				let list = []
 				this.localBankAccounts.forEach(function(account, index) {
 					list.push(account.id)
 				})
 
-				payload = {
+				let payload = {
 					list: JSON.stringify(list)
 				}
 
@@ -148,9 +122,11 @@
 					
 						let d = new Date()
 
+						vm.$emit("bankAccountsChange");
+
 						vm.$emit("alertUpdate",{
 							class: "alert-success",
-							msg: "Saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds(),
+							msg: "Accounts re-ordere saved at "+d.getHours() + ":" +d.getMinutes()+ ":"+d.getSeconds(),
 							visible: true
 						})
 					}
