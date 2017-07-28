@@ -76,9 +76,9 @@
 									<i class="fa fa-fw fa-arrows icon-button sort-income" v-if="budgetEditable"></i>
 								</td>
 								<td :class="{'has-control': budgetEditable}" class="income-source">
-									<i v-if="income.progress >= 100" class="fa fa-check-circle-o progress-icon"></i>
-									<span v-if="income.progress < 100" class="progress-value">{{Math.round(income.progress)}}% </span>
-									<div class="progress-bar" :style="{width: income.progress +'%'}"></div>
+									<i v-if="income.progress >= 100 && budgetInCurrentMonth" class="fa fa-check-circle-o progress-icon"></i>
+									<span v-if="income.progress < 100 && budgetInCurrentMonth" class="progress-value">{{Math.round(income.progress)}}% </span>
+									<div v-if="budgetInCurrentMonth" class="progress-bar" :style="{width: income.progress +'%'}"></div>
 
 									<div class="value-container">
 										<input 
@@ -324,6 +324,7 @@
 				groups: [],
 				budget_year: 0,
 				budget_month: 0,
+				budgetInCurrentMonth: false,
 				income_sources: [],
 				incomeTransactions: [],
 				budgetEditable: true,
@@ -578,6 +579,8 @@
 				
 				this.budget_year = d.getFullYear()
 				this.budget_month = d.getMonth() + 1
+
+				this.setBudgetInCurrentMonth()
 			},
 			changeBudgetYear(up) {
 				if (up) {
@@ -587,6 +590,7 @@
 					this.budget_year--
 				}
 				this.fetchBudget()
+				this.setBudgetInCurrentMonth()
 			},
 			incrementBudgetMonth () {
 				if (this.budget_month == 12) {
@@ -596,6 +600,8 @@
 				else 
 					this.budget_month++
 
+				this.setBudgetInCurrentMonth()
+
 			},
 			decrementBudgetMonth() {
 				if (this.budget_month == 1) {
@@ -604,6 +610,8 @@
 				}
 				else 
 					this.budget_month--
+
+				this.setBudgetInCurrentMonth()
 			},
 			addIncome() {
 				this.income_sources.push({
@@ -622,6 +630,14 @@
 			doneEditingBudget () {
 				this.editCategories = false
 				this.fetchBudget()
+			},
+			setBudgetInCurrentMonth ()
+			{
+				let d = new Date()
+				if (d.getFullYear() == this.budget_year && d.getMonth()+1 == this.budget_month)
+					this.budgetInCurrentMonth = true
+				else
+					this.budgetInCurrentMonth = false
 			},
 			deleteItem(resource, id, executeFunction) {
 				
@@ -962,6 +978,7 @@
 
 	td.income-source {
 		position: relative;
+		overflow: hidden;
 	}
 
 	.income-source .progress-bar {
