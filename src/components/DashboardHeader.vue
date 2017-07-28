@@ -5,6 +5,10 @@
 			<div class="side-menu-button menu-button" v-on:click="toggleMenu"><i class="fa fa-navicon"></i></div>
 			<h1><i class='fa' :class="pageIcon"></i> {{pageTitle}}</h1>
 
+			<div class="new-transaction-button-container">
+				<i class="fa fa-plus icon-button" title="Add new transaction" v-on:click.prevent="showModal""></i>
+			</div>
+
 			<transition
 			name="offlineNoticeShowHide"
 			enter-active-class="zoomIn"
@@ -34,7 +38,6 @@
 				Menu 
 				<i class="fa pull-right" :class="{'fa-caret-down' : menuButtonsCollapsed, 'fa-caret-up' : !menuButtonsCollapsed}"></i>
 			</h2>
-			{{ userType }}
 			<ul class="menu-list" v-if="!menuButtonsCollapsed">
 				<li><a href="#" v-on:click.prevent="showModal"><i class="fa fa-fw fa-plus"></i> New Transaction</a></li>
 
@@ -177,10 +180,16 @@
 
 	}
 
+	.new-transaction-button-container {
+		position: absolute;
+		top: 13px;
+		right: 15px;
+	}
+
 	.header-flag {
 		position: absolute;
 		top: 5px;
-		right: 5px;
+		right: 45px;
 		padding: 5px;
 		border-radius: 4px;
 	}

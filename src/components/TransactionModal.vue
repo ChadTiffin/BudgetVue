@@ -67,6 +67,7 @@
 									v-on:input="updateValue"
 									v-on:change="categoryChange"
 									:groups = "groups"
+									:incomes = "incomes"
 									includeIncome="true"
 									includeOffBudget="true"
 									name="cat_id">
@@ -166,7 +167,7 @@
 
 	export default {
 		name: 'TransactionModal',
-		props: ['modalVisible','groups','fieldData',"tranType", "bankAccounts"],
+		props: ['modalVisible','groups','fieldData',"tranType", "bankAccounts","incomes"],
 		data() {
 			return {
 				postUrl: window.apiBase + "transaction/save",
@@ -254,10 +255,20 @@
 				this.$emit("input",value)
 			},
 			categoryChange() {
+
+				if (isNaN(this.localFieldData.cat_id)) {
+					this.localFieldData.description = this.localFieldData.cat_id
+					this.localFieldData.cat_id = 0
+				}
+
 				if (this.localFieldData.cat_id == 0)
 					this.localFieldData.in_out = 0
 				else
 					this.localFieldData.in_out = 1
+			},
+			autoFillIncomeDescription(income) {
+				console.log("3")
+				this.localFieldData.description = income.source
 			},
 			submitForm() {
 				let vm = this

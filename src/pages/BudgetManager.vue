@@ -71,21 +71,27 @@
 							:options="{handle:'.sort-income'}"
 							v-on:update="autoSave(income_sources,'budget','save-order')"
 							>
-							<tr v-for="income in income_sources">
+							<tr v-for="income in localIncomeSources">
 								<td class="btn-col has-control">
 									<i class="fa fa-fw fa-arrows icon-button sort-income" v-if="budgetEditable"></i>
 								</td>
-								<td :class="{'has-control': budgetEditable}" >
-									<input 
-										v-if="income.descEditable && budgetEditable" 
-										v-on:blur="income.descEditable = false" 
-										v-on:change="autoSave(income,'income','save')" 
-										v-model="income.source" 
-										type="text" 
-										class="form-control" 
-										autofocus>
+								<td :class="{'has-control': budgetEditable}" class="income-source">
+									<i v-if="income.progress >= 100" class="fa fa-check-circle-o progress-icon"></i>
+									<span v-if="income.progress < 100" class="progress-value">{{Math.round(income.progress)}}% </span>
+									<div class="progress-bar" :style="{width: income.progress +'%'}"></div>
 
-									<div v-else v-on:click="income.descEditable = true">{{ income.source }}</div>
+									<div class="value-container">
+										<input 
+											v-if="income.descEditable && budgetEditable" 
+											v-on:blur="income.descEditable = false" 
+											v-on:change="autoSave(income,'income','save')" 
+											v-model="income.source" 
+											type="text" 
+											class="form-control" 
+											autofocus>
+
+										<div v-else v-on:click="income.descEditable = true">{{ income.source }}</div>
+									</div>
 
 								</td>
 								<td class="number col-amounts" :class="{'has-control': budgetEditable}" style="width: 120px">
@@ -109,7 +115,7 @@
 						<tfoot>
 							<tr>
 								<th></th>
-								<th class="number">Total</th>
+								<th class="number">Total Planned</th>
 								<th class="number">{{ totalIncomes }}</th>
 								<th class="btn-col">
 									<i class="fa fa-fw fa-plus icon-button" 
@@ -117,6 +123,12 @@
 										v-on:click="addIncome" 
 										v-if="budgetEditable"></i>
 								</th>
+							</tr>
+							<tr>
+								<th></th>
+								<th class="number">Total Actual</th>
+								<th class="number">{{ totalActualIncome }}</th>
+								<th></th>
 							</tr>
 						</tfoot>
 					</table>
@@ -313,6 +325,7 @@
 				budget_year: 0,
 				budget_month: 0,
 				income_sources: [],
+				incomeTransactions: [],
 				budgetEditable: true,
 				noBudgetFound: false,
 				panelFixed: false,
@@ -494,6 +507,42 @@
 				});
 
 				return localgroups
+			},
+			localIncomeSources() {
+				let newIncomes = []
+				let vm = this
+
+				this.income_sources.forEach(function(income, index) {
+					//total up incomes under this source
+					let this_total = 0
+
+					vm.incomeTransactions.forEach(function(tran,index) {
+						if (tran.description == income.source) {
+							//console.log("match")
+							this_total += parseFloat(tran.amount)
+						}
+
+					})
+
+					this_total = this_total / income.amount * 100
+
+					vm.$set(income,"progress",this_total)
+
+					newIncomes.push(income)
+				})
+
+				return newIncomes
+			},
+			totalActualIncome() {
+				let total = 0
+				this.incomeTransactions.forEach(function(inc, index){
+					total += parseFloat(inc.amount)
+				})
+
+				return total
+			},
+			incomeDifferencePlannedActual() {
+				return this.totalIncomes - this.totalActualIncome
 			}
 		},
 		methods: {
@@ -838,14 +887,37 @@
 				})
 			},
 			handleScroll() {
-				if (window.innerWidth > 600 && document.body.scrollTop > 150)
+				if (document.body.scrollTop > 150)
 					this.panelFixed = true
 				else
 					this.panelFixed = false
+			},
+			fetchIncomeTransactions()
+			{
+				let vm = this
+
+				let d = new Date();
+
+				let last_day_of_month = new Date(d.getFullYear(), d.getMonth() + 1, 0)
+				last_day_of_month = last_day_of_month.getDate()
+
+				let filters = {
+					'tran_date >=': d.getFullYear()+"-"+(d.getMonth()+1)+"-01",
+					'tran_date <=': d.getFullYear()+"-"+(d.getMonth()+1)+"-"+last_day_of_month,
+					'cat_id' : 0,
+				}
+
+				let query = "?filters="+JSON.stringify(filters)
+
+				this.getJSON(window.apiBase+"transaction/get"+query).then(function(response){
+					vm.incomeTransactions = response
+				})
 			}
 		},
 		created () {
 			this.jumpToCurrentMonth()
+			this.fetchIncomeTransactions()
+
 			window.addEventListener('scroll', this.handleScroll);
 		},
 		destroyed () {
@@ -861,15 +933,20 @@
 	}
 
 	thead .btn-col {
-		width: 40px
+		width: 30px
 	}
 
 	.fixed-top-left {
 		position: fixed;
-		top: 50px;
+		top: -75px;
 		box-shadow: 1px 1px 10px black;
 		z-index: 5;
-		animation: slideDownFixed 1s;
+		animation: slideDownFixed 0.3s;
+		transition: top 1s;
+	}
+
+	.fixed-top-left:hover {
+		top: 50px;
 	}
 
 	@keyframes slideDownFixed {
@@ -879,8 +956,41 @@
 		}
 
 		to {
-			top: 50px;
+			top: -75px;
 		}
+	}
+
+	td.income-source {
+		position: relative;
+	}
+
+	.income-source .progress-bar {
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		left: 0;
+		height: calc(100% + 1px);
+		background-color: #dff0d8;
+	}
+
+	.progress-icon {
+		position: absolute;
+		color: #428627;
+		font-size: 18px;
+		right: 5px;
+		top: 10px;
+		z-index: 2
+	}
+
+	.income-source .value-container {
+		position: relative;
+		z-index: 3;
+	}
+
+	.income-source .progress-value {
+		position: absolute;
+		right: 5px;
+		z-index: 2;
 	}
 
 	.budget-tables table {
@@ -935,6 +1045,12 @@
 
 		.date-controls .selected-date {
 			width: calc(100% - 130px);
+		}
+	}
+
+	@media (max-width: 500px) {
+		.progress-icon, .income-source .progress-value {
+			display: none;
 		}
 	}
 

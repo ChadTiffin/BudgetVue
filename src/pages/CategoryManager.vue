@@ -93,10 +93,13 @@
 
 				let vm = this
 				this.localGroups.forEach(function(group, index) {
-					vm.$set(group,'descEditable',false)
+
+					if (!("descEditable" in group))
+						vm.$set(group,'descEditable',false)
 
 					group.categories.forEach(function(cat, index) {
-						vm.$set(cat, 'descEditable', false)
+						if (!("descEditable" in cat))
+							vm.$set(cat, 'descEditable', false)
 					})
 				})
 			} 

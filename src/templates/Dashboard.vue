@@ -73,6 +73,7 @@
 		<TransactionModal
 			:modal-visible="transactionModalVisible"
 			:groups="masterGroups"
+			:incomes="incomeSources"
 			:field-data="transactionData"
 			:bank-accounts="bankAccounts"
 			tran-type="Transaction"
@@ -242,6 +243,7 @@
 				pageTitle: "",
 				pageIcon: "",
 				masterGroups: [],
+				incomeSources: [],
 				pagesMeta: {
 					"/budget" : {
 						title: "Budget",
@@ -509,7 +511,24 @@
 					else 
 						vm.pagesMeta["/clear-imported-transactions"].nav = false
 				})
-			}
+			},
+			fetchIncomes() {
+				let vm = this
+
+				let d = new Date();
+
+				let filters = {
+					bud_year : d.getFullYear(),
+					bud_month: d.getMonth() + 1
+				}
+
+				let query = "?filters="+JSON.stringify(filters)
+
+				this.getJSON(window.apiBase + "income/get"+query).then(function(response){
+					vm.incomeSources = response
+				})
+			},
+			
 		},
 		computed: {
 			transactionModalVisibleState : function(){
@@ -552,6 +571,8 @@
 			this.fetchGroups()
 			this.fetchBankAccounts()
 			this.fetchPendingImports()
+			this.fetchIncomes()
+			//this.fetchIncomeTransactions()
 
 			this.pageTitle = this.pagesMeta[this.currentRoute].title
 			this.pageIcon = this.pagesMeta[this.currentRoute].icon
@@ -658,7 +679,7 @@
 	}
 
 	.table>tbody>tr>td.td-indent {
-		padding-left: 20px;
+		padding-left: 15px;
 	}
 
 	tbody>tr>td.has-control, tbody>tr>th.has-control {
@@ -667,11 +688,11 @@
 	}
 
 	td.btn-col, th.btn-col {
-		width: 40px;
+		width: 30px;
 	}
 
 	thead .btn-col {
-		width: 80px;
+		width: 60px;
 	}
 
 	.table>thead>tr>th, .table>thead>tr>td, .table>tbody>tr>td {
@@ -740,13 +761,11 @@
 		.col2-control {
 			display: block;
 			width: 100%;
-			width: calc(100% + 30px);
-			margin-left: -15px
 		}
 
 		.vdp-datepicker {
-			display: inline-block;
-			width: auto;
+			display: block;
+			width: 100%;
 		}
 	}
 </style>

@@ -1,6 +1,7 @@
 <template>
 	
 	<select class="form-control" :name="name" v-on:change="change" v-on:input="updateValue($event.target.value)">
+		<slot></slot>
 		<option v-for="group in groups" :value="group.id">{{ group.name }}</option>
 	</select>
 	

@@ -36,7 +36,9 @@
 									<label class="input-group-addon">
 										<input type="checkbox" v-model="includeGroupFilter" v-on:change="filterTransactions">
 									</label>
-									<GroupsSelect v-model="groupFilterId" :groups="groups" v-on:change="filterTransactions" v-on:click="filterTransactions"></GroupsSelect>
+									<GroupsSelect v-model="groupFilterId" :groups="groups" v-on:change="filterTransactions" v-on:click="filterTransactions">
+										<option>Select a Group...</option>
+									</GroupsSelect>
 								</div>
 							</div>
 
@@ -51,7 +53,7 @@
 										v-model="categoryFilterId" 
 										v-on:change="filterTransactions"
 										v-on:click="filterTransactions">
-
+										<option>Select a Category...</option>
 										<option v-for="cat in filterGroupCategories" :value="cat.id">{{ cat.description }}</option>
 									</select>
 								</div>
@@ -206,6 +208,7 @@
 "July", "August", "September", "October", "November", "December" ],
 				activeFilterButton: -1,
 				showAdvancedFiltering: false,
+				filterGroupCategories: [],
 				confirmDialog : {
 					visible: false,
 					title: "",
@@ -268,12 +271,28 @@
 
 				this.fetchTransactions(this.filtering)
 			},
+			updateCategoryList() {
+				
+				let vm = this
+				let categories = []
+
+				this.groups.forEach(function(group, index) {
+					//console.log(group.id)
+					if (vm.filtering.group_id == group.id) {
+						categories = group.categories
+					}
+				})
+
+				this.filterGroupCategories = categories
+			},
 			filterTransactions() {
 
 				if (this.includeGroupFilter) 
 					this.filtering.group_id = this.groupFilterId
 				else
 					this.filtering.group_id = null
+
+				this.updateCategoryList()
 
 				if (this.includeCategoryFilter)
 					this.filtering.cat_id = this.categoryFilterId
@@ -337,8 +356,9 @@
 					}
 				}
 
-				this.spinnerVisible = true,
-				this.getJSON(window.apiBase + "transaction/get/"+filtering.date_from+"/"+filtering.date_to+"/"+filtering.group_id+"/"+filtering.cat_id+"/"+filtering.amount_low+"/"+filtering.amount_high+"/"+filtering.keyword+"/"+filtering.user_id).then(function(response){
+				this.spinnerVisible = true
+
+				this.getJSON(window.apiBase + "transaction/filter/"+filtering.date_from+"/"+filtering.date_to+"/"+filtering.group_id+"/"+filtering.cat_id+"/"+filtering.amount_low+"/"+filtering.amount_high+"/"+filtering.keyword+"/"+filtering.user_id).then(function(response){
 
 					vm.spinnerVisible = false
 
@@ -359,18 +379,6 @@
 			}
 		},
 		computed: {
-			filterGroupCategories() {
-
-				let vm = this
-				let categories = []
-				this.groups.forEach(function(group, index) {
-					if (vm.filtering.group_id == group.id) {
-						categories = group.categories
-					}
-				})
-
-				return categories
-			},
 			totalsDisplayed () {
 				let total_debit = 0
 				let total_credit = 0
@@ -485,6 +493,11 @@
 		margin-bottom: 10px;
 	}
 
+	.filtering .input-group {
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+
 	@media (max-width: 815px) {
 		.filtering .btn-group label.btn {
 			width: 14.27%;
@@ -496,6 +509,13 @@
 			width: 100%;
 			margin-top: 10px;
 
+		}
+	}
+
+	@media (max-width: 500px) {
+		.filtering .panel-body {
+			padding: 0;
+			padding-top: 10px;
 		}
 	}
 

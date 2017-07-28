@@ -1,6 +1,7 @@
 <template>
 
 	<select class="form-control" :name="name" v-on:change="change">
+		<slot></slot>
 		<option v-for="cat in categories" :value="cat.id">{{ cat.description }}</option>
 	</select>
 
