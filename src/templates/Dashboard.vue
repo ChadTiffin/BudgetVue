@@ -45,6 +45,7 @@
 				v-if="currentRoute == '/transactions'" 
 				:groups='masterGroups'
 				:categories='masterCategories'
+				:bank-accounts="bankAccounts"
 				:is-offline="isOffline"
 				v-on:showTransactionModal="showTransactionModal"
 				v-on:alertUpdate="updateAlert"
@@ -517,10 +518,10 @@
 
 				let d = new Date();
 
-				let filters = {
-					bud_year : d.getFullYear(),
-					bud_month: d.getMonth() + 1
-				}
+				let filters = [
+					['bud_year' , d.getFullYear()],
+					['bud_month', d.getMonth() + 1]
+				]
 
 				let query = "?filters="+JSON.stringify(filters)
 

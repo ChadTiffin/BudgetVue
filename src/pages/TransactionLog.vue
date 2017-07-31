@@ -20,7 +20,7 @@
 			</div>
 
 			<button 
-				v-on:click="toggleAdvancedFilteringPanel" 
+				v-on:click="showAdvancedFiltering ? showAdvancedFiltering = false : showAdvancedFiltering = true " 
 				class="btn btn-default toggle-advanced-filtering">
 				<i class="fa fa-search"></i> Toggle Advanced Filtering</a>
 			</button>
@@ -30,6 +30,25 @@
 
 					<form class="form-horizontal">
 						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label col-md-3">Bank Account</label>
+								<div class="input-group col-md-9">
+									<label class="input-group-addon">
+										<input type="checkbox" v-model="includeBankAccountFilter" v-on:change="filterTransactions">
+									</label>
+									<select class="form-control" v-model="bankAccountFilterId" v-on:change="filterTransactions">
+										<option>Select a Bank Account...</option>
+										<option
+											v-for="(account, index) in bankAccounts" 
+											v-if="account.off_budget == 0" 
+											:value="account.id">
+											{{ account.description }}
+										</option>
+										<option value="0">(No Account)</option>
+									</select>
+								</div>
+							</div>
+
 							<div class="form-group">
 								<label class="control-label col-md-3">Group</label>
 								<div class="input-group col-md-9">
@@ -69,14 +88,14 @@
 									<!--<input type="date" class="form-control col2-control" name="date_from" v-on:change="filterTransactions" v-model="filtering.date_from">
 									<input type="date" class="form-control col2-control"  name="date_to" v-on:change="filterTransactions" v-model="filtering.date_to">-->
 									<DateField 
-										v-model="filtering.date_from"
+										v-model="filtering.date_from[1]"
 										v-on:change="filterTransactions"
 										name="date_from"
 										extra-classes="form-control"
 										class="col2-control">
 									</DateField>
 									<DateField 
-										v-model="filtering.date_to"
+										v-model="filtering.date_to[1]"
 										v-on:change="filterTransactions"
 										name="date_to"
 										extra-classes="form-control"
@@ -89,15 +108,15 @@
 								<label class="control-label col-md-3">Amounts</label>
 								<div class="col-md-9">
 									<input type="number" step="0.01" 
-									class="form-control  col2-control" name="amount_low" placeholder="Min $" v-on:change="filterTransactions" v-model="filtering.amount_low">
-									<input type="number" step="0.01" class="form-control  col2-control"  name="amount_high" placeholder="Max $"  v-on:change="filterTransactions" v-model="filtering.amount_high">
+									class="form-control  col2-control" name="amount_low" placeholder="Min $" v-on:change="filterTransactions" v-model="filtering.amount_low[1]">
+									<input type="number" step="0.01" class="form-control  col2-control"  name="amount_high" placeholder="Max $"  v-on:change="filterTransactions" v-model="filtering.amount_high[1]">
 								</div>
 							</div>
 							
 							<div class="form-group">
 								<label class="control-label col-md-3">Keyword</label>
 								<div class="col-md-9">
-									<input type="text" class="form-control" name="keyword" placeholder="Keyword..." v-on:change="filterTransactions" v-model="filtering.keyword">
+									<input type="text" class="form-control" name="keyword" placeholder="Keyword..." v-on:change="filterTransactions" v-model="filtering.keyword[1]">
 								</div>
 							</div>
 
@@ -107,7 +126,7 @@
 			</div>
 		</div>
 
-		<p>{{ filterMessage }}</p>
+		<!--<p>{{ filterMessage }}</p>-->
 
 		<p>{{ transactions.length }} transactions listed.</p>
 		<div style="overflow-x: auto;">
@@ -134,9 +153,12 @@
 				<tbody>
 					<tr v-for="tran in transactions">
 						<td>{{ tran.tran_date }}</td>
-						<td>{{ tran.account_name != null ? tran.account_name : 'N/A'}}</td>
+						<td>{{ tran.bank_accounts != null ? tran.bank_accounts.description : 'N/A'}}</td>
 						<td>
-							<strong>{{ tran.cat_id == 0 ? 'Income' : tran.group_name }}</strong>{{ tran.cat_id == 0 ? '' : ': '+tran.cat_description }}
+							<strong>
+								{{ tran.categories.name }}{{ tran.categories.name ? ':' : '' }}
+							</strong>
+							{{ tran.categories.description }}
 						</td>
 						<td>{{ tran.description }}</td>
 						<td class="bg-outflows number">{{ parseInt(tran.in_out) ? tran.amount : '' }}</td>
@@ -194,7 +216,7 @@
 			DateField,
 			ModalDialog
 		},
-		props: ["groups",'categories','isOffline'],
+		props: ["groups",'categories','bankAccounts','isOffline'],
 		data () {
 			return {
 				transactions : [],
@@ -204,6 +226,8 @@
 				groupFilterId: 0,
 				includeCategoryFilter: false,
 				categoryFilterId: 0,
+				includeBankAccountFilter: false,
+				bankAccountFilterId: 0,
 				months: [ "January", "February", "March", "April", "May", "June",
 "July", "August", "September", "October", "November", "December" ],
 				activeFilterButton: -1,
@@ -221,22 +245,16 @@
 		methods: {
 			resetFiltering() {
 				this.filtering = {
-					date_from : this.currentMonthFirstDay,
-					date_to: this.currentMonthLastDay,
-					group_id : null,
-					cat_id : null,
-					amount_low : null,
-					amount_high: null,
-					keyword : null,
-					user_id : null 
+					date_from : ["tran_date >=",this.currentMonthFirstDay],
+					date_to: ["tran_date <=",this.currentMonthLastDay],
+					account_id: ["account_id",null],
+					group_id : ["group_id",null],
+					cat_id : ["cat_id",null],
+					amount_low : ["amount >=",null],
+					amount_high: ["amount <=",null],
+					keyword : ["transactions.description",null,"like"],
+					user_id : ["user_id",null] 
 				}
-			},
-			toggleAdvancedFilteringPanel() {
-				if (this.showAdvancedFiltering) {
-					this.showAdvancedFiltering = false
-				}
-				else
-					this.showAdvancedFiltering = true
 			},
 			toggleGroupfilter() {
 
@@ -256,16 +274,25 @@
 				let last_day_of_month = new Date(this.currentYear, d.getMonth() + 1, 0)
 				last_day_of_month = last_day_of_month.getDate()
 
-				this.filtering.date_from = this.currentYear + "-" + mon + "-01"
-				this.filtering.date_to = this.currentYear + "-" + mon + "-" + last_day_of_month
+				this.filtering.date_from = [
+					"tran_date >=", this.currentYear + "-" + mon + "-01"
+				]
+
+				this.filtering.date_to = [
+					"tran_date <=", this.currentYear + "-" + mon + "-" + last_day_of_month
+				]
 
 				this.fetchTransactions(this.filtering)
 			},
 			filterYear(year) {
 				this.resetFiltering()
 
-				this.filtering.date_from = year + "-01-01"
-				this.filtering.date_to = year + "-12-31"
+				this.filtering.date_from = [
+					"tran_date >=", year + "-01-01"
+				]
+				this.filtering.date_to = [
+					"tran_date <=", year + "-12-31"
+				]
 
 				this.activeFilterButton = year
 
@@ -278,7 +305,7 @@
 
 				this.groups.forEach(function(group, index) {
 					//console.log(group.id)
-					if (vm.filtering.group_id == group.id) {
+					if (vm.filtering.group_id[1] == group.id) {
 						categories = group.categories
 					}
 				})
@@ -288,16 +315,25 @@
 			filterTransactions() {
 
 				if (this.includeGroupFilter) 
-					this.filtering.group_id = this.groupFilterId
+					this.filtering.group_id[1] = this.groupFilterId
+					
 				else
-					this.filtering.group_id = null
-
-				this.updateCategoryList()
+					this.filtering["group_id"][1] = null
 
 				if (this.includeCategoryFilter)
-					this.filtering.cat_id = this.categoryFilterId
+					this.filtering.cat_id[1] = this.categoryFilterId
+					
 				else
-					this.filtering.cat_id = null
+					this.filtering["cat_id"][1] = null
+
+				if (this.includeBankAccountFilter)
+					this.filtering.account_id = [
+						'account_id', this.bankAccountFilterId
+					]
+				else
+					this.filtering["account_id"][1] = null
+
+				this.updateCategoryList()
 
 				this.fetchTransactions(this.filtering)
 
@@ -350,14 +386,32 @@
 			fetchTransactions (filtering) {
 				let vm = this
 
-				for (var key in filtering) {
-					if (!filtering[key]) {
-						filtering[key] = null
-					}
-				}
-
 				this.spinnerVisible = true
 
+				let filters = []
+				for (var key in filtering) {
+					if (filtering[key][1] != null) {
+						filters.push([
+							filtering[key][0],filtering[key][1],
+						])
+					}
+				}
+				let query = "?filters="+JSON.stringify(filters)
+
+				this.getJSON(window.apiBase + "transaction/get"+query).then(function(response){
+
+					vm.spinnerVisible = false
+
+					if (response.status == 'offline') {
+						vm.transactions = JSON.parse(localStorage.transactionLog)
+					}
+					else {
+						vm.transactions = response
+						localStorage.transactionLog = JSON.stringify(response)
+					}
+				})
+
+				/*
 				this.getJSON(window.apiBase + "transaction/filter/"+filtering.date_from+"/"+filtering.date_to+"/"+filtering.group_id+"/"+filtering.cat_id+"/"+filtering.amount_low+"/"+filtering.amount_high+"/"+filtering.keyword+"/"+filtering.user_id).then(function(response){
 
 					vm.spinnerVisible = false
@@ -369,10 +423,8 @@
 						vm.transactions = response.transactions
 						localStorage.transactionLog = JSON.stringify(response.transactions)
 					}
-				})
+				})*/
 
-				if (this.filtering.keyword == null)
-					this.filtering.keyword = ""
 			},
 			showTransactionModal(tran) {
 				this.$emit("showTransactionModal",tran)
@@ -427,13 +479,13 @@
 
 				return current_month
 			},
-			filterMessage() {
+			/*filterMessage() {
 				let message = "Filtering ";
 
-				if (this.filtering.group_id != null)
+				if (this.filtering.group_id[1] != null)
 					message += " by group and"
 
-				if (this.filtering.cat_id != null)
+				if (this.filtering.cat_id[1] != null)
 					message += " by category and"
 				
 				if (this.filtering.date_from != null)
@@ -458,21 +510,23 @@
 					message += " with description containing '" + this.filtering.keyword + "'"
 
 				return message
-			}
+			}*/
 		},
 		created () {
 			let vm = this
 
-			this.filtering.date_from = this.currentMonthFirstDay
-			this.filtering.date_to = this.currentMonthLastDay
+			this.resetFiltering()
+
+			this.filtering.date_from = ['tran_date >=',this.currentMonthFirstDay]
+			this.filtering.date_to = ['tran_date <=',this.currentMonthLastDay]
 
 			//asign filtering url vars to filtering params
 			for (var key in this.$route.query) {
 
-				if (this.$route.query[key] == 'undefined')
-					this.filtering[key] = null
+				if (this.$route.query[key][1] == 'undefined')
+					this.filtering[key][1] = null
 				else
-					this.filtering[key] = this.$route.query[key]
+					this.filtering[key][1] = this.$route.query[key]
 			}
 
 			this.fetchTransactions(this.filtering)

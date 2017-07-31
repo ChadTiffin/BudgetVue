@@ -917,11 +917,11 @@
 				let last_day_of_month = new Date(d.getFullYear(), d.getMonth() + 1, 0)
 				last_day_of_month = last_day_of_month.getDate()
 
-				let filters = {
-					'tran_date >=': d.getFullYear()+"-"+(d.getMonth()+1)+"-01",
-					'tran_date <=': d.getFullYear()+"-"+(d.getMonth()+1)+"-"+last_day_of_month,
-					'cat_id' : 0,
-				}
+				let filters = [
+					['tran_date >=', d.getFullYear()+"-"+(d.getMonth()+1)+"-01"],
+					['tran_date <=', d.getFullYear()+"-"+(d.getMonth()+1)+"-"+last_day_of_month],
+					['cat_id', 0],
+				]
 
 				let query = "?filters="+JSON.stringify(filters)
 
