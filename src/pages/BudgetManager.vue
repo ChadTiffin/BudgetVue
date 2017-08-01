@@ -380,7 +380,9 @@
 				vm.grandTotals.outflows = 0
 				let totalBudgetBalance = 0
 
-				let incomeRemaining = parseFloat(this.thisMonthIncome)
+				let incomeRemaining = 0
+				if (this.thisMonthIncome != null) 
+					incomeRemaining = parseFloat(this.thisMonthIncome)
 
 				this.groups.forEach(function(group, index) {
 
@@ -396,10 +398,12 @@
 
 						let newCatInflows = 0;
 
-						if (incomeRemaining >= parseFloat(cat.amount_alloc)) {
+						if (parseFloat(incomeRemaining) >= parseFloat(cat.amount_alloc)) {
 							incomeRemaining -= parseFloat(cat.amount_alloc)
 							newCatInflows = parseFloat(cat.amount_alloc) + parseFloat(cat.inflows)
 							cat['balanceAfterInjection'] = cat.balance + parseFloat(cat.amount_alloc)
+
+
 						}
 						else {
 							
@@ -519,7 +523,6 @@
 
 					vm.incomeTransactions.forEach(function(tran,index) {
 						if (tran.description == income.source) {
-							//console.log("match")
 							this_total += parseFloat(tran.amount)
 						}
 
@@ -683,6 +686,39 @@
 					
 				})
 			},
+			rolloverBudget() {
+				let last_month = 0
+				let last_budget_year = 0
+
+				if (this.budget_month == 1) {
+					last_month = 12
+					last_budget_year = this.budget_year - 1
+				}
+				else {
+					last_budget_year = this.budget_year
+					last_month = this.budget_month - 1
+				}
+
+				let payload = {
+					year: last_budget_year,
+					month: last_month
+				}
+
+				let vm = this
+
+				this.postData(window.apiBase + "budget/rollover",payload).then(function(response){
+					vm.confirmDialog.visible = false 
+
+					vm.$emit("alertUpdate",{
+						class: "alert-success",
+						msg: "Budget Rolled Over",
+						visible: true
+					})
+
+					vm.fetchBudget()
+				})
+
+			},
 			confirmationDialogResponse (response) {
 				if (response) {
 					this[this.confirmDialog.successFunction](this.confirmDialog.parameters)
@@ -744,6 +780,14 @@
 						localStorage.budgetIncomeSources = JSON.stringify(json.income_sources)
 						localStorage.budgetThisMonthIncome = json.total_income
 						localStorage.budgetLastSavedLocally = currentDate
+
+						if (json.rollover_needed) {
+							vm.confirmDialog.visible = true;
+							vm.confirmDialog.title = "Rollover Budget?"
+							vm.confirmDialog.message = "The last month's budget has completed. Would you like to rollover?"
+							vm.confirmDialog.successFunction = "rolloverBudget"
+							vm.confirmDialog.buttonText = "Rollover"
+						}
 
 						alert_visible = false
 
