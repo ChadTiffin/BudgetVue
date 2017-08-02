@@ -14,7 +14,7 @@
 			:transactions-synced="transactionsSynced"
 			:alert="alert"
 			v-on:navigate="navigate"
-			v-on:toggleMenu="toggleMenu"
+			v-on:toggleMenu="menuShowing ? menuShowing = false : menuShowing = true"
 			v-on:showAccountsModal="showAccountsModal"
 			v-on:showImportModal="importModalVisible = true"
 			>
@@ -421,12 +421,6 @@
 				// file upload progress
 				// returns false if progress is not computable
 				this.fileUpload.msg = "Uploading... " + e + "%";
-			},
-			toggleMenu: function(e) {
-				if (this.menuShowing)
-					this.menuShowing = false;
-				else 
-					this.menuShowing = true;
 			},
 			saveBankAccount () {
 				let vm = this

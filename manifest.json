@@ -3,5 +3,9 @@
   "short_name": "Budget 2.0",
   "start_url": "https://budget.chadtiffin.com/budget",
   "display": "standalone",
-  "orientation" : "any"
+  "orientation" : "any",
+  "icons": {
+	  "48": "static/favicon-48.ico",
+	  "96": "static/logo.png"
+	}
 }
