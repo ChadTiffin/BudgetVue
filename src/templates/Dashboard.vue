@@ -1,5 +1,5 @@
 <template>
-	<div class="dashboard">
+	<div class="dashboard" v-if="loggedIn">
 
 		<DashboardHeader
 			v-on:showModal="showTransactionModal"
@@ -251,42 +251,42 @@
 						icon: "fa-pie-chart",
 						nav: true,
 						offlinePage: true,
-						permRequired: ['User','Admin','Root']
+						permRequired: ["Demo", 'User','Admin','Root']
 					},
 					"/transactions" : {
 						title: "Transaction Log",
 						icon: "fa-list-ul",
 						nav: true,
 						offlinePage: true,
-						permRequired: ['User','Admin','Root']
+						permRequired: ["Demo", 'User','Admin','Root']
 					},
 					"/clear-imported-transactions" : {
 						title: "Clear Pending Imports",
 						icon: "fa-clock-o",
 						nav: false,
 						offlinePage: false,
-						permRequired: ['User','Admin','Root']
+						permRequired: ["Demo", 'User','Admin','Root']
 					},
 					"/categories" : {
 						title: "Categories & Groups",
 						icon: "fa-tags",
 						nav: true,
 						offlinePage: false,
-						permRequired: ['User','Admin','Root']
+						permRequired: ["Demo", 'User','Admin','Root']
 					},
 					"/accounts" : {
 						title: "Bank Accounts",
 						icon: "fa-bank",
 						nav: true,
 						offlinePage: false,
-						permRequired: ['User','Admin','Root']
+						permRequired: ["Demo", 'User','Admin','Root']
 					},
 					'/my-profile' : {
 						title: "My Profile",
 						icon: "fa-user-circle",
 						nav: true,
 						offlinePage: false,
-						permRequired: ['User','Admin','Root']
+						permRequired: ["Demo", 'User','Admin','Root']
 					},
 					"/users" : {
 						title : "Users",
@@ -563,6 +563,12 @@
 				this.menuShowing = true
 			}
 
+			//check for api key storage
+			if ("apiKey" in localStorage) 
+				this.loggedIn = true
+			else
+				window.location = "/login"
+			
 			this.fetchGroups()
 			this.fetchBankAccounts()
 			this.fetchPendingImports()
